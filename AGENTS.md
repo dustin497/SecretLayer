@@ -37,6 +37,8 @@ Promotion is blocked unless safety score ≥ 80 with zero critical findings.
 
 ### Non-obvious notes
 
+- **`main` may be a stub** (README only). Use `git checkout cursor/secretlayer-foundation-73f9` if `package.json` is missing.
+- After `pnpm install`, run `pnpm build` once if promotion/safety CLI bins are missing (`secretlayer-safety`).
 - Web proxies `/api/*` → `localhost:8787` via Vite config.
 - API uses in-memory stores in dev; production uses Railway + persistent DB (not yet in repo).
 - Live production frontend bundle is separate from this repo until migrated.
