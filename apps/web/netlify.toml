@@ -1,0 +1,19 @@
+[build]
+  base = "/"
+  command = "pnpm install && pnpm --filter @secretlayer/web build"
+  publish = "apps/web/dist"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.secretlayer.net/:splat"
+  status = 200
+  force = true
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"

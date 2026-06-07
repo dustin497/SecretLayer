@@ -10,6 +10,9 @@ const DEFAULT_CHANNELS: PromotionChannel[] = [
   "changelog",
   "marketing-site",
   "social-announcement",
+  "email-waitlist",
+  "lead-nurture",
+  "deploy-production",
 ];
 
 export function buildPromotionPlan(input: PromotionInput): PromotionPlan {

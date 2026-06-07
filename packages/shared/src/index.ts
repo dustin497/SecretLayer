@@ -1,3 +1,5 @@
+export { SECRET_PATTERNS, REQUIRED_SECURITY_HEADERS, type SecretPattern } from "./patterns.js";
+
 export type SafetySeverity = "info" | "warn" | "critical";
 
 export type SafetyCheckId =
@@ -34,7 +36,41 @@ export type PromotionChannel =
   | "marketing-site"
   | "social-announcement"
   | "changelog"
-  | "email-waitlist";
+  | "email-waitlist"
+  | "lead-nurture";
+
+export type LeadSource = "landing" | "waitlist" | "safety-scanner" | "vault-demo" | "changelog";
+export type LeadIntent = "early-access" | "pro-upgrade" | "newsletter" | "builder-tools";
+
+export interface PromotionLead {
+  id: string;
+  email: string;
+  source: LeadSource;
+  intent: LeadIntent;
+  message?: string;
+  createdAt: string;
+  nurturedAt?: string;
+}
+
+export interface NurtureTouchpoint {
+  day: number;
+  subject: string;
+  body: string;
+  cta: string;
+}
+
+export interface VaultItemRecord {
+  clientId: string;
+  userId: string;
+  label: string;
+  encryptedBlob: unknown;
+  encryptionMeta: {
+    clientEncrypted: boolean;
+    algorithm: string;
+    syncedBy: string;
+  };
+  updatedAt: string;
+}
 
 export interface PromotionPlan {
   channels: PromotionChannel[];

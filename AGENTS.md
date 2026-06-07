@@ -1,43 +1,52 @@
 # AGENTS.md
 
-Guidance for Cursor Cloud agents working on **SecretLayer** ([secretlayer.net](https://secretlayer.net)).
+Guidance for Cursor Cloud agents on **SecretLayer** ([secretlayer.net](https://secretlayer.net)).
 
 ## Cursor Cloud specific instructions
 
+### Repository
+
+GitHub: `dustin497/SecretLayer`.
+
 ### Services
 
-| Service | Port | Command | Required |
-|---------|------|---------|----------|
-| API | 8787 | `pnpm dev:api` | Yes (for full stack) |
-| Web | 5173 | `pnpm dev:web` | Yes (for UI) |
+| Service | Port | Command |
+|---------|------|---------|
+| API | 8787 | `pnpm dev:api` |
+| Web | 5173 | `pnpm dev:web` |
 
-Run both: `pnpm dev` (parallel).
+Run both: `pnpm dev`.
 
-### Dependencies
+### VM update script
 
-VM update script: `pnpm install`
-
-### Lint / test / build
-
-```bash
+```
 pnpm install
-pnpm build
-pnpm test
-pnpm typecheck
+pnpm --filter @secretlayer/shared build
+pnpm --filter @secretlayer/safety-engine build
+pnpm --filter @secretlayer/promotion build
+pnpm --filter @secretlayer/crypto build
 ```
 
-### Safety & promotion
+### Verify full stack
 
 ```bash
-pnpm safety:run https://secretlayer.net .
-pnpm promote:check https://secretlayer.net 0.2.0
+pnpm build && pnpm test
+pnpm dev:api & sleep 2
+curl -s http://localhost:8787/health
 ```
 
-Promotion is blocked unless safety score ≥ 80 with zero critical findings.
+### Integration
 
-### Non-obvious notes
+```bash
+JWT_SECRET=local-dev-secret pnpm integrate
+```
 
-- Web proxies `/api/*` → `localhost:8787` via Vite config.
-- API uses in-memory stores in dev; production uses Railway + persistent DB (not yet in repo).
-- Live production frontend bundle is separate from this repo until migrated.
-- Repo was misspelled `SecretLair-` on GitHub; product name is **SecretLayer**.
+### Promotion
+
+Dry run writes to `promotion-output/`. `--execute` appends CHANGELOG and can POST `NETLIFY_BUILD_HOOK`.
+
+### Notes
+
+- Web proxies `/api/*` → local API in dev; Netlify proxies to `api.secretlayer.net` in production.
+- Vault encryption uses `@secretlayer/crypto` (PBKDF2 210k iterations, AES-GCM-256).
+- API dev uses in-memory storage.

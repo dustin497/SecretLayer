@@ -23,4 +23,5 @@ jobs:
       - name: Scan production headers
         env:
           JWT_SECRET: ci-placeholder-not-default
+          ADMIN_API_KEY: ci-audit-key
         run: pnpm safety:run https://secretlayer.net .

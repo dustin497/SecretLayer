@@ -1,18 +1,17 @@
 # SecretLayer
 
-**[secretlayer.net](https://secretlayer.net)** — vault-first secrets for builders. Organize projects into encrypted vaults, run industry-calibrated safety nets, and promote only after checks pass.
-
-> The GitHub repo was previously misspelled as `SecretLair-`. This monorepo is the canonical SecretLayer codebase.
+**[secretlayer.net](https://secretlayer.net)** — vault-first secrets for builders. Projects, encrypted vaults, safety nets, and promotion gates that only fire after checks pass.
 
 ## Stack
 
 | Package | Purpose |
 |---------|---------|
-| `apps/web` | React + Vite frontend |
-| `apps/api` | Express API (auth, projects, vault-items) |
+| `apps/web` | React app — landing, auth, vault dashboard, safety scanner |
+| `apps/api` | Express API — auth, projects, vault-items, leads, analytics |
+| `packages/crypto` | AES-GCM + PBKDF2 vault encryption (production-compatible) |
 | `packages/safety-engine` | Pre-ship safety scans |
-| `packages/promotion` | Promotion gate (runs after safety passes) |
-| `packages/shared` | Shared types |
+| `packages/promotion` | Promotion gate + lead nurture + channel execution |
+| `packages/shared` | Types and secret leak patterns |
 
 ## Quick start
 
@@ -22,28 +21,29 @@ cp .env.example .env
 pnpm dev          # web :5173 + api :8787
 ```
 
-## Commands
+Open http://localhost:5173 — sign up, create a project, unlock vault, add encrypted secrets.
+
+## Integration pipeline
 
 ```bash
-pnpm build        # build all packages
-pnpm test         # run tests
-pnpm safety:run   # scan secretlayer.net (+ optional source dir)
-pnpm promote:check # safety → promotion plan
+pnpm integrate    # build + test + safety scan + promotion dry-run
+pnpm safety:run https://secretlayer.net .
+pnpm promote:check https://secretlayer.net 0.3.0           # dry run
+pnpm promote:check --execute https://secretlayer.net 0.3.0 # write changelog, marketing, trigger Netlify hook
 ```
 
-## Live product
+## Promotion leads
 
-Production today runs on **Netlify** (web) and **Railway** (`api.secretlayer.net`). This repo rebuilds and extends that MVP with:
+- `POST /leads` — waitlist, safety-scanner, vault-demo sources
+- Nurture sequences generated in `packages/promotion` when safety clears
+- Artifacts written to `promotion-output/` (changelog, social, marketing)
 
-- Safety engine + promotion gate in CI
-- Clear vault → project data model
-- Path to CLI, GitHub Actions, and automated marketing
+## Deploy
 
-See [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) and [docs/SAFETY_NETS.md](docs/SAFETY_NETS.md).
+- **Web:** Netlify (`apps/web/netlify.toml`) — proxies `/api` to production API
+- **API:** Railway (`api.secretlayer.net`)
 
-## Environment
+## Docs
 
-Copy `.env.example` to `.env`. Key variables:
-
-- `JWT_SECRET` — API auth (required in production)
-- `PROMOTION_WEBHOOK_URL` — optional webhook when promotion gate passes
+- [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md)
+- [docs/SAFETY_NETS.md](docs/SAFETY_NETS.md)

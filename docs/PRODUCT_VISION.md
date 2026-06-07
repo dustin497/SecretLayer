@@ -54,4 +54,4 @@ Account
 
 ## Repository note
 
-The GitHub repo was originally named `SecretLair-` (misspelled). This codebase is the canonical **SecretLayer** monorepo. Consider renaming the GitHub repository to `SecretLayer` or `secretlayer`.
+The GitHub repository is **`dustin497/SecretLayer`** — the canonical monorepo for secretlayer.net.
