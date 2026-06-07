@@ -43,6 +43,7 @@ export const api = {
       headers: authHeaders(token),
       body: JSON.stringify({ name, description }),
     }),
+  billingConfig: () => request<BillingConfigResponse>("/billing/config"),
   billingPlan: (token: string) =>
     request<BillingPlanResponse>("/billing/plan", { headers: authHeaders(token) }),
   billingCheckout: (token: string, plan: string) =>
@@ -82,6 +83,14 @@ export const api = {
       body: JSON.stringify({ event, properties }),
     }),
 };
+
+export interface BillingConfigResponse {
+  mode: string;
+  configured: boolean;
+  mirrorpathReference: string;
+  dashboard: Record<string, string>;
+  plans: { id: string; name: string; priceLabel: string; paymentLinkConfigured: boolean }[];
+}
 
 export interface BillingPlanResponse {
   plan: string;

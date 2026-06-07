@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      stripe:
+        specifier: ^22.2.0
+        version: 22.2.0(@types/node@22.19.20)
 
   apps/api:
     dependencies:

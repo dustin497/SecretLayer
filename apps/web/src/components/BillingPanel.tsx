@@ -26,7 +26,15 @@ export function BillingPanel({
       await api.trackEvent("billing.checkout.start", { plan: target });
       window.location.href = url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Checkout failed");
+      const message = err instanceof Error ? err.message : "Checkout failed";
+      setError(message);
+      if (message.includes("not configured")) {
+        api.billingConfig().then((c) => {
+          setError(
+            `${message} Open Stripe (same account as Mirror Path): ${c.dashboard.paymentLinks}`,
+          );
+        }).catch(() => {});
+      }
       setBusy(false);
     }
   }

@@ -1,8 +1,9 @@
 import { Router, type NextFunction, type Request, type Response } from "express";
 import { normalizePlanId, type PlanId } from "@secretlayer/shared";
 import { audit, getUser } from "../store.js";
+import { getBillingPublicConfig } from "./config.js";
 import { buildBillingPlanResponse } from "./plan.js";
-import { createCheckoutSession, createPortalSession, stripeConfigured } from "./stripe.js";
+import { billingCheckoutAvailable, createCheckoutSession, createPortalSession, stripeConfigured } from "./stripe.js";
 import { handleStripeWebhook } from "./webhook.js";
 
 type AuthMiddleware = (req: Request, res: Response, next: NextFunction) => void;
@@ -22,6 +23,10 @@ export async function stripeWebhookHandler(req: Request, res: Response) {
 export function createBillingRouter(auth: AuthMiddleware, webOrigin: string) {
   const router = Router();
 
+  router.get("/config", (_req, res) => {
+    res.json(getBillingPublicConfig());
+  });
+
   router.get("/plan", auth, (req, res) => {
     const user = getUser((req as AuthedRequest).userId);
     if (!user) return res.status(404).json({ error: "User not found." });
@@ -29,8 +34,11 @@ export function createBillingRouter(auth: AuthMiddleware, webOrigin: string) {
   });
 
   router.post("/checkout", auth, async (req, res) => {
-    if (!stripeConfigured()) {
-      return res.status(503).json({ error: "Billing is not configured. Set STRIPE_SECRET_KEY and price IDs." });
+    if (!billingCheckoutAvailable()) {
+      return res.status(503).json({
+        error: "Billing is not configured. Run pnpm stripe:setup or add Payment Links (Mirror Path style).",
+        dashboard: getBillingPublicConfig().dashboard,
+      });
     }
     const user = getUser((req as AuthedRequest).userId);
     if (!user) return res.status(404).json({ error: "User not found." });

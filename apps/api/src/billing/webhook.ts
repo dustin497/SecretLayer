@@ -1,8 +1,13 @@
 import type Stripe from "stripe";
-import { normalizePlanId } from "@secretlayer/shared";
+import { normalizePlanId, type PlanId } from "@secretlayer/shared";
 import { audit, getUser, users } from "../store.js";
 import { applySubscriptionToUser } from "./plan.js";
 import { getStripe, planFromStripeSubscription } from "./stripe.js";
+
+function inferPlanFromSession(session: Stripe.Checkout.Session): PlanId {
+  if (session.metadata?.plan) return normalizePlanId(session.metadata.plan);
+  return "personal";
+}
 
 export async function handleStripeWebhook(rawBody: Buffer, signature: string | undefined): Promise<void> {
   const stripe = getStripe();
@@ -14,11 +19,13 @@ export async function handleStripeWebhook(rawBody: Buffer, signature: string | u
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
-      const userId = session.metadata?.userId;
+      const userId = session.metadata?.userId ?? session.client_reference_id ?? undefined;
       if (!userId) break;
       const user = getUser(userId);
       if (!user) break;
-      const plan = normalizePlanId(session.metadata?.plan);
+      const plan = normalizePlanId(
+        session.metadata?.plan ?? inferPlanFromSession(session),
+      );
       applySubscriptionToUser(user, {
         plan,
         stripeCustomerId: typeof session.customer === "string" ? session.customer : session.customer?.id,

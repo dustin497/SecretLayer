@@ -14,9 +14,13 @@
     "typecheck": "pnpm -r typecheck",
     "safety:run": "pnpm --filter @secretlayer/safety-engine cli",
     "promote:check": "pnpm --filter @secretlayer/promotion cli",
-    "integrate": "pnpm build && pnpm test && pnpm safety:run https://secretlayer.net . && pnpm promote:check https://secretlayer.net 0.3.0"
+    "integrate": "pnpm build && pnpm test && pnpm safety:run https://secretlayer.net . && pnpm promote:check https://secretlayer.net 0.3.0",
+    "stripe:setup": "node scripts/stripe-bootstrap.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "stripe": "^22.2.0"
   }
 }

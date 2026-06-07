@@ -45,7 +45,13 @@ pnpm promote:check --execute https://secretlayer.net 0.3.0 # write changelog, ma
 # See docs/BILLING.md for Stripe Dashboard setup
 ```
 
-Set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PERSONAL`, `STRIPE_PRICE_PRO`, and `STRIPE_WEBHOOK_SECRET` on Railway.
+**One-command setup** (same Stripe account as [mirrorpathai.com](https://mirrorpathai.com)):
+
+```bash
+STRIPE_SECRET_KEY=sk_test_... pnpm stripe:setup
+```
+
+Copy `.env.stripe.generated` → Railway. Full walkthrough: [docs/STRIPE_SETUP_WALKTHROUGH.md](docs/STRIPE_SETUP_WALKTHROUGH.md)
 
 ## Promotion leads
 

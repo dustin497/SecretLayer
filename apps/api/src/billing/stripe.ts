@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import { normalizePlanId, type PlanId } from "@secretlayer/shared";
 import type { User } from "../store.js";
+import { buildPaymentLinkUrl, hasPaymentLinks } from "./paymentLinks.js";
 
 let stripeClient: Stripe | null = null;
 
@@ -15,6 +16,10 @@ export function getStripe(): Stripe | null {
 
 export function stripeConfigured(): boolean {
   return Boolean(process.env.STRIPE_SECRET_KEY);
+}
+
+export function billingCheckoutAvailable(): boolean {
+  return stripeConfigured() || hasPaymentLinks();
 }
 
 function priceIdForPlan(plan: PlanId): string | undefined {
@@ -38,8 +43,11 @@ export async function createCheckoutSession(
   plan: PlanId,
   webOrigin: string,
 ): Promise<string> {
+  const paymentLink = buildPaymentLinkUrl(plan, user);
+  if (paymentLink) return paymentLink;
+
   const stripe = getStripe();
-  if (!stripe) throw new Error("Stripe is not configured.");
+  if (!stripe) throw new Error("Stripe is not configured. Add STRIPE_SECRET_KEY or Payment Links (see docs/STRIPE_SETUP_WALKTHROUGH.md).");
 
   const priceId = priceIdForPlan(plan);
   if (!priceId) throw new Error(`No Stripe price configured for plan: ${plan}`);
