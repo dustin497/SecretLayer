@@ -44,10 +44,18 @@ export const api = {
       body: JSON.stringify({ name, description }),
     }),
   billingPlan: (token: string) =>
-    request<{ plan: string; limits: { secrets: number; projects: number }; usage: { secrets: number; projects: number } }>(
-      "/billing/plan",
-      { headers: authHeaders(token) },
-    ),
+    request<BillingPlanResponse>("/billing/plan", { headers: authHeaders(token) }),
+  billingCheckout: (token: string, plan: string) =>
+    request<{ url: string }>("/billing/checkout", {
+      method: "POST",
+      headers: authHeaders(token),
+      body: JSON.stringify({ plan }),
+    }),
+  billingPortal: (token: string) =>
+    request<{ url: string }>("/billing/portal", {
+      method: "POST",
+      headers: authHeaders(token),
+    }),
   vaultItems: (token: string) =>
     request<{ vaultItems: VaultItemResponse[] }>("/vault-items", { headers: authHeaders(token) }),
   syncVaultItem: (token: string, clientId: string, body: unknown) =>
@@ -74,6 +82,15 @@ export const api = {
       body: JSON.stringify({ event, properties }),
     }),
 };
+
+export interface BillingPlanResponse {
+  plan: string;
+  subscriptionStatus: string | null;
+  currentPeriodEnd: string | null;
+  hasStripeCustomer: boolean;
+  limits: { secrets: number | null; projects: number | null };
+  usage: { secrets: number; projects: number };
+}
 
 export interface VaultItemResponse {
   clientId: string;

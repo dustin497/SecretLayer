@@ -32,6 +32,21 @@ pnpm promote:check https://secretlayer.net 0.3.0           # dry run
 pnpm promote:check --execute https://secretlayer.net 0.3.0 # write changelog, marketing, trigger Netlify hook
 ```
 
+## Stripe billing
+
+| Plan | Price | Secrets | Projects |
+|------|-------|---------|----------|
+| Free | $0 | 10 | 3 |
+| Personal | $4.99/mo | Unlimited | Unlimited |
+| Pro | $9.99/mo | Unlimited | Unlimited |
+
+```bash
+# API routes: GET /billing/plan, POST /billing/checkout, POST /billing/portal
+# See docs/BILLING.md for Stripe Dashboard setup
+```
+
+Set `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PERSONAL`, `STRIPE_PRICE_PRO`, and `STRIPE_WEBHOOK_SECRET` on Railway.
+
 ## Promotion leads
 
 - `POST /leads` — waitlist, safety-scanner, vault-demo sources

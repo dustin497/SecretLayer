@@ -40,7 +40,7 @@ Account
 ### Phase 2 — Vault UX
 - Import existing MVP data from production API
 - Unlock flow, vault items CRUD, backup/export
-- Stripe billing parity with live site
+- ~~Stripe billing parity with live site~~ (wired in v0.3.1)
 
 ### Phase 3 — Builder growth
 - CLI (`secretlayer init`) for local `.env` injection

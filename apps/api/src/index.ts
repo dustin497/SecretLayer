@@ -1,8 +1,10 @@
 import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { FREE_PLAN_LIMITS, type PromotionLead } from "@secretlayer/shared";
-import { audit, auditLog, leads, projects, sessions, users, vaultItems } from "./store.js";
+import type { PromotionLead } from "@secretlayer/shared";
+import { createBillingRouter, stripeWebhookHandler } from "./billing/router.js";
+import { assertProjectAllowed, assertSecretAllowed } from "./billing/plan.js";
+import { audit, auditLog, getUser, leads, projects, sessions, users, vaultItems } from "./store.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 8787);
@@ -10,6 +12,9 @@ const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:5173";
 const adminKey = process.env.ADMIN_API_KEY;
 
 app.use(cors({ origin: [webOrigin, "https://secretlayer.net"], credentials: true }));
+
+app.post("/billing/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
+
 app.use(express.json({ limit: "512kb" }));
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, standardHeaders: true });
@@ -40,8 +45,15 @@ function adminAuth(req: express.Request, res: express.Response, next: express.Ne
   next();
 }
 
+app.use("/billing", createBillingRouter(auth, webOrigin));
+
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "secretlayer-backend", version: "0.3.0" });
+  res.json({
+    ok: true,
+    service: "secretlayer-backend",
+    version: "0.3.0",
+    stripe: Boolean(process.env.STRIPE_SECRET_KEY),
+  });
 });
 
 app.post("/auth/signup", authLimiter, (req, res) => {
@@ -51,7 +63,7 @@ app.post("/auth/signup", authLimiter, (req, res) => {
     return res.status(409).json({ error: "Account already exists." });
   }
   const id = crypto.randomUUID();
-  users.set(id, { id, email, password });
+  users.set(id, { id, email, password, plan: "free", subscriptionStatus: null, currentPeriodEnd: null });
   const token = crypto.randomUUID();
   sessions.set(token, id);
   audit("auth.signup", email, id);
@@ -83,10 +95,12 @@ app.get("/projects", auth, (req, res) => {
 
 app.post("/projects", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
-  const count = [...projects.values()].filter((p) => p.userId === userId).length;
-  if (count >= FREE_PLAN_LIMITS.projects) {
-    return res.status(403).json({ error: "Project limit reached for free plan." });
-  }
+  const user = getUser(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+
+  const limitError = assertProjectAllowed(user);
+  if (limitError) return res.status(403).json({ error: limitError });
+
   const { name, description } = req.body ?? {};
   if (!name) return res.status(400).json({ error: "Project name required." });
   const project = {
@@ -101,17 +115,6 @@ app.post("/projects", auth, (req, res) => {
   res.status(201).json({ project });
 });
 
-app.get("/billing/plan", auth, (req, res) => {
-  const userId = (req as express.Request & { userId: string }).userId;
-  const projectCount = [...projects.values()].filter((p) => p.userId === userId).length;
-  const secretCount = [...vaultItems.values()].filter((v) => v.userId === userId).length;
-  res.json({
-    plan: "free",
-    limits: FREE_PLAN_LIMITS,
-    usage: { secrets: secretCount, projects: projectCount },
-  });
-});
-
 app.get("/vault-items", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
   const items = [...vaultItems.values()].filter((v) => v.userId === userId);
@@ -120,6 +123,9 @@ app.get("/vault-items", auth, (req, res) => {
 
 app.put("/vault-items/client/:clientId", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
+  const user = getUser(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+
   const clientId = String(req.params.clientId);
   const { label, encryptedBlob, encryptionMeta, updatedAt } = req.body ?? {};
 
@@ -127,11 +133,9 @@ app.put("/vault-items/client/:clientId", auth, (req, res) => {
     return res.status(400).json({ error: "Encrypted blob required." });
   }
 
-  const count = [...vaultItems.values()].filter((v) => v.userId === userId).length;
   const existing = vaultItems.get(clientId);
-  if (!existing && count >= FREE_PLAN_LIMITS.secrets) {
-    return res.status(403).json({ error: "Secret limit reached for free plan." });
-  }
+  const limitError = assertSecretAllowed(user, !existing);
+  if (limitError) return res.status(403).json({ error: limitError });
 
   if (existing && existing.userId !== userId) {
     return res.status(409).json({ error: "Client ID conflict." });

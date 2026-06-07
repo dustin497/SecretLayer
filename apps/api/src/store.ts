@@ -1,9 +1,14 @@
-import type { PromotionLead, VaultItemRecord } from "@secretlayer/shared";
+import type { PlanId, PromotionLead, VaultItemRecord } from "@secretlayer/shared";
 
 export interface User {
   id: string;
   email: string;
   password: string;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  plan: PlanId;
+  subscriptionStatus?: string | null;
+  currentPeriodEnd?: string | null;
 }
 
 export interface Project {
@@ -38,4 +43,8 @@ export function audit(action: string, detail: string, userId?: string) {
     at: new Date().toISOString(),
   });
   if (auditLog.length > 500) auditLog.shift();
+}
+
+export function getUser(userId: string): User | undefined {
+  return users.get(userId);
 }

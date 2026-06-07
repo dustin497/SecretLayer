@@ -105,9 +105,14 @@ export interface Vault {
   updatedAt: string;
 }
 
-export interface PlanLimits {
-  secrets: number;
-  projects: number;
-}
-
-export const FREE_PLAN_LIMITS: PlanLimits = { secrets: 10, projects: 3 };
+export {
+  PLAN_CATALOG,
+  FREE_PLAN_LIMITS,
+  limitsForPlan,
+  isWithinLimit,
+  normalizePlanId,
+  planToApiLabel,
+  type PlanId,
+  type PlanDefinition,
+  type PlanLimits,
+} from "./plans.js";

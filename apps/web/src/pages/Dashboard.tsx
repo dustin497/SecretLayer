@@ -1,5 +1,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { BillingPanel } from "../components/BillingPanel";
+import type { BillingPlanResponse } from "../lib/api";
 import {
   decryptVaultItem,
   encryptVaultItem,
@@ -17,7 +19,8 @@ interface DecryptedItem extends VaultItemPlaintext {
 export function Dashboard() {
   const { session, vaultPassword, setVaultPassword, setSession } = useAuth();
   const [projects, setProjects] = useState<{ id: string; name: string }[]>([]);
-  const [plan, setPlan] = useState<{ usage: { secrets: number; projects: number }; limits: { secrets: number; projects: number } } | null>(null);
+  const [plan, setPlan] = useState<BillingPlanResponse | null>(null);
+  const [searchParams] = useSearchParams();
   const [items, setItems] = useState<DecryptedItem[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>("");
   const [newProject, setNewProject] = useState("");
@@ -41,6 +44,12 @@ export function Dashboard() {
   useEffect(() => {
     load().catch(() => setStatus("Could not load dashboard."));
   }, [load]);
+
+  useEffect(() => {
+    const billing = searchParams.get("billing");
+    if (billing === "success") setStatus("Subscription updated — thank you!");
+    if (billing === "cancel") setStatus("Checkout canceled.");
+  }, [searchParams]);
 
   async function unlockVault(e: FormEvent) {
     e.preventDefault();
@@ -119,11 +128,7 @@ export function Dashboard() {
         </div>
       </header>
 
-      {plan && (
-        <p className="muted">
-          Plan: free — {plan.usage.projects}/{plan.limits.projects} projects, {plan.usage.secrets}/{plan.limits.secrets} secrets
-        </p>
-      )}
+      {plan && <BillingPanel token={token} plan={plan} onRefresh={() => load().catch(() => {})} />}
 
       {locked ? (
         <form className="card form" onSubmit={unlockVault}>

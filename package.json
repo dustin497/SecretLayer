@@ -1,6 +1,6 @@
 {
   "name": "secretlayer",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "SecretLayer — vault-first secrets for builders. Projects, encrypted vaults, safety nets, and promotion gates.",
   "packageManager": "pnpm@10.33.3",
