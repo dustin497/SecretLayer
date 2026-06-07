@@ -3,7 +3,17 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import { runPromotionGate } from "@secretlayer/promotion";
 import { fetchHeaders, runSafetySuite } from "@secretlayer/safety-engine";
-import { FREE_PLAN_LIMITS, type WaitlistLead } from "@secretlayer/shared";
+import type { BillingPlanResponse, WaitlistLead } from "@secretlayer/shared";
+import {
+  applyStripeEvent,
+  billingConfigured,
+  createCheckoutSession,
+  createPortalSession,
+  isCheckoutPlanId,
+  limitsForPlan,
+  verifyWebhookSignature,
+  type BillingUser,
+} from "./billing/index.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 8787);
@@ -16,6 +26,24 @@ app.use(
     credentials: true,
   }),
 );
+
+app.post(
+  "/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    try {
+      const signature = req.headers["stripe-signature"];
+      const event = verifyWebhookSignature(req.body as Buffer, typeof signature === "string" ? signature : undefined);
+      applyStripeEvent(event, billingStore);
+      res.json({ received: true });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      const status = message.includes("signature") ? 400 : 500;
+      res.status(status).json({ error: message });
+    }
+  },
+);
+
 app.use(express.json({ limit: "256kb" }));
 
 const authLimiter = rateLimit({
@@ -32,11 +60,24 @@ const publicLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+interface UserRecord extends BillingUser {
+  password: string;
+}
+
 // In-memory store for local dev (replace with DB in production)
-const users = new Map<string, { id: string; email: string; password: string }>();
+const users = new Map<string, UserRecord>();
 const sessions = new Map<string, string>();
 const projects = new Map<string, { id: string; userId: string; name: string }>();
 const waitlistLeads = new Map<string, WaitlistLead>();
+
+const billingStore = {
+  getUserById(userId: string) {
+    return users.get(userId);
+  },
+  getUserByStripeCustomerId(customerId: string) {
+    return [...users.values()].find((user) => user.stripeCustomerId === customerId);
+  },
+};
 
 function auth(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
@@ -56,6 +97,29 @@ function auth(req: express.Request, res: express.Response, next: express.NextFun
   }
 
   return res.status(401).json({ error: "Authentication required." });
+}
+
+function createUserRecord(id: string, email: string, password: string): UserRecord {
+  return {
+    id,
+    email,
+    password,
+    plan: "FREE",
+    subscriptionStatus: null,
+    currentPeriodEnd: null,
+  };
+}
+
+function billingPlanResponse(user: UserRecord): BillingPlanResponse {
+  const projectCount = [...projects.values()].filter((project) => project.userId === user.id).length;
+  return {
+    plan: user.plan,
+    subscriptionStatus: user.subscriptionStatus,
+    currentPeriodEnd: user.currentPeriodEnd,
+    hasStripeCustomer: Boolean(user.stripeCustomerId),
+    limits: limitsForPlan(user.plan),
+    usage: { secrets: 0, projects: projectCount },
+  };
 }
 
 async function buildSafetyReport(target = "https://secretlayer.net") {
@@ -84,6 +148,7 @@ app.get("/health", (_req, res) => {
     service: "secretlayer-backend",
     version: appVersion,
     waitlistCount: waitlistLeads.size,
+    billingConfigured: billingConfigured(),
   });
 });
 
@@ -121,7 +186,7 @@ app.post("/leads/waitlist", publicLimiter, (req, res) => {
   }
 
   const normalized = email.trim().toLowerCase();
-  const existing = [...waitlistLeads.values()].find((l) => l.email === normalized);
+  const existing = [...waitlistLeads.values()].find((lead) => lead.email === normalized);
   if (existing) {
     return res.json({ lead: existing, message: "Already on the waitlist." });
   }
@@ -149,11 +214,11 @@ app.post("/auth/signup", authLimiter, (req, res) => {
   const { email, password } = req.body ?? {};
   if (!email || !password) return res.status(400).json({ error: "Email and password required." });
 
-  const existing = [...users.values()].find((u) => u.email === email);
+  const existing = [...users.values()].find((user) => user.email === email);
   if (existing) return res.status(409).json({ error: "Account already exists." });
 
   const id = crypto.randomUUID();
-  users.set(id, { id, email, password });
+  users.set(id, createUserRecord(id, email, password));
   const token = crypto.randomUUID();
   sessions.set(token, id);
 
@@ -162,7 +227,7 @@ app.post("/auth/signup", authLimiter, (req, res) => {
 
 app.post("/auth/login", authLimiter, (req, res) => {
   const { email, password } = req.body ?? {};
-  const user = [...users.values()].find((u) => u.email === email && u.password === password);
+  const user = [...users.values()].find((record) => record.email === email && record.password === password);
   if (!user) return res.status(401).json({ error: "Invalid credentials." });
 
   const token = crypto.randomUUID();
@@ -178,15 +243,19 @@ app.post("/auth/logout", auth, (req, res) => {
 
 app.get("/projects", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
-  const list = [...projects.values()].filter((p) => p.userId === userId);
+  const list = [...projects.values()].filter((project) => project.userId === userId);
   res.json({ projects: list });
 });
 
 app.post("/projects", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
-  const userProjects = [...projects.values()].filter((p) => p.userId === userId);
-  if (userProjects.length >= FREE_PLAN_LIMITS.projects) {
-    return res.status(403).json({ error: "Project limit reached for free plan." });
+  const user = users.get(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+
+  const userProjects = [...projects.values()].filter((project) => project.userId === userId);
+  const projectLimit = limitsForPlan(user.plan).projects;
+  if (userProjects.length >= projectLimit) {
+    return res.status(403).json({ error: "Project limit reached for your plan." });
   }
 
   const { name } = req.body ?? {};
@@ -199,12 +268,55 @@ app.post("/projects", auth, (req, res) => {
 
 app.get("/billing/plan", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
-  const projectCount = [...projects.values()].filter((p) => p.userId === userId).length;
-  res.json({
-    plan: "free",
-    limits: FREE_PLAN_LIMITS,
-    usage: { secrets: 0, projects: projectCount },
-  });
+  const user = users.get(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+  res.json(billingPlanResponse(user));
+});
+
+app.post("/billing/checkout", auth, async (req, res) => {
+  const userId = (req as express.Request & { userId: string }).userId;
+  const user = users.get(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+
+  const plan = req.body?.plan;
+  if (!isCheckoutPlanId(plan)) {
+    return res.status(400).json({ error: 'Plan must be "personal" or "pro".' });
+  }
+
+  if (!billingConfigured()) {
+    return res.status(503).json({
+      error: "Billing is not configured.",
+      detail: "Set STRIPE_SECRET_KEY, STRIPE_PRICE_ID_PERSONAL, and STRIPE_PRICE_ID_PRO on the API server (Railway).",
+    });
+  }
+
+  try {
+    const url = await createCheckoutSession(user, plan, webOrigin);
+    res.json({ url });
+  } catch (err) {
+    res.status(500).json({ error: "Could not start Stripe Checkout.", detail: String(err) });
+  }
+});
+
+app.post("/billing/portal", auth, async (req, res) => {
+  const userId = (req as express.Request & { userId: string }).userId;
+  const user = users.get(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+
+  if (!user.stripeCustomerId) {
+    return res.status(400).json({ error: "No Stripe customer on file. Upgrade first." });
+  }
+
+  if (!billingConfigured()) {
+    return res.status(503).json({ error: "Billing is not configured." });
+  }
+
+  try {
+    const url = await createPortalSession(user, webOrigin);
+    res.json({ url });
+  } catch (err) {
+    res.status(500).json({ error: "Billing portal failed.", detail: String(err) });
+  }
 });
 
 app.get("/vault-items", auth, (_req, res) => {
@@ -213,4 +325,7 @@ app.get("/vault-items", auth, (_req, res) => {
 
 app.listen(port, () => {
   console.log(`SecretLayer API listening on http://localhost:${port}`);
+  if (!billingConfigured()) {
+    console.warn("Stripe billing is not fully configured — checkout and portal routes will return 503.");
+  }
 });

@@ -63,5 +63,8 @@ See [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) and [docs/SAFETY_NETS.md](d
 Copy `.env.example` to `.env`. Key variables:
 
 - `JWT_SECRET` — API auth (required in production)
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID_*` — billing (Railway only in production)
 - `PROMOTION_WEBHOOK_URL` — optional webhook when promotion gate passes
+
+**Stripe payments broken?** See [docs/STRIPE_SETUP.md](docs/STRIPE_SETUP.md) for which key goes where and how to rotate compromised secrets.
 - `APP_VERSION` — version string for promotion leads (default `0.2.0`)

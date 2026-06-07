@@ -28,6 +28,9 @@ importers:
       express-rate-limit:
         specifier: ^7.5.0
         version: 7.5.1(express@5.2.1)
+      stripe:
+        specifier: ^18.1.0
+        version: 18.5.0(@types/node@22.19.20)
     devDependencies:
       '@types/cors':
         specifier: ^2.8.17
@@ -1096,6 +1099,15 @@ packages:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
+  stripe@18.5.0:
+    resolution: {integrity: sha512-Hp+wFiEQtCB0LlNgcFh5uVyKznpDjzyUZ+CNVEf+I3fhlYvh7rZruIg+jOwzJRCpy0ZTPMjlzm7J2/M2N6d+DA==}
+    engines: {node: '>=12.*'}
+    peerDependencies:
+      '@types/node': '>=12.x.x'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   tinyglobby@0.2.17:
     resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
@@ -2082,6 +2094,12 @@ snapshots:
   source-map-js@1.2.1: {}
 
   statuses@2.0.2: {}
+
+  stripe@18.5.0(@types/node@22.19.20):
+    dependencies:
+      qs: 6.15.2
+    optionalDependencies:
+      '@types/node': 22.19.20
 
   tinyglobby@0.2.17:
     dependencies:

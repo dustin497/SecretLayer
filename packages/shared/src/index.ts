@@ -84,9 +84,22 @@ export interface Vault {
   updatedAt: string;
 }
 
+export type BillingPlanId = "FREE" | "PERSONAL" | "PRO";
+
 export interface PlanLimits {
   secrets: number;
   projects: number;
 }
 
 export const FREE_PLAN_LIMITS: PlanLimits = { secrets: 10, projects: 3 };
+export const PERSONAL_PLAN_LIMITS: PlanLimits = { secrets: Number.MAX_SAFE_INTEGER, projects: Number.MAX_SAFE_INTEGER };
+export const PRO_PLAN_LIMITS: PlanLimits = { secrets: Number.MAX_SAFE_INTEGER, projects: Number.MAX_SAFE_INTEGER };
+
+export interface BillingPlanResponse {
+  plan: BillingPlanId;
+  subscriptionStatus: string | null;
+  currentPeriodEnd: string | null;
+  hasStripeCustomer: boolean;
+  limits: PlanLimits;
+  usage: { secrets: number; projects: number };
+}

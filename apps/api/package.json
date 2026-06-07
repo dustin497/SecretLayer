@@ -17,7 +17,8 @@
     "@secretlayer/shared": "workspace:*",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "express-rate-limit": "^7.5.0"
+    "express-rate-limit": "^7.5.0",
+    "stripe": "^18.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
