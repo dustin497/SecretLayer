@@ -6,6 +6,8 @@ A compassionate, professional website for a drug testing clinic in Bessemer, Ala
 
 - **index.html** — Home page with services, credentials, reviews, help resources, and contact info
 - **about.html** — About page with the clinic's story and values
+- **forms/nail-specimen-custody.html** — Printable nail keratin chain-of-custody form (wash record, barcodes, lab shipping)
+- **forms/nail-test-results.html** — Printable clean/negative results report template
 
 ## Local Preview
 
