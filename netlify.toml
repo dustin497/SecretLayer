@@ -1,9 +1,11 @@
 [build]
-  command = "corepack enable && pnpm install && pnpm --filter @secretlayer/web build"
+  command = "corepack enable && pnpm install --frozen-lockfile && pnpm run build:netlify"
   publish = "apps/web/dist"
 
 [build.environment]
   NODE_VERSION = "22"
+  NPM_CONFIG_FUND = "false"
+  NPM_CONFIG_AUDIT = "false"
 
 [[redirects]]
   from = "/api/*"

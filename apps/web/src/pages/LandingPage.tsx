@@ -387,7 +387,7 @@ export function LandingPage({ onOpenWwh2 }: LandingPageProps) {
         <button type="button" className="wwh2-powered-badge" onClick={onOpenWwh2} aria-label="Open WWH2 guided help">
           Powered by WWH2
         </button>
-        <p>secretlayer.net · WWH2 guided help is free for all users</p>
+        <p>secretlayer.net · WWH2 guided help is free for all users · build 0.2.0-wwh2</p>
       </footer>
     </div>
   );

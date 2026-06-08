@@ -8,6 +8,7 @@
     "dev": "pnpm -r --parallel dev",
     "dev:web": "pnpm --filter @secretlayer/web dev",
     "dev:api": "pnpm --filter @secretlayer/api dev",
+    "build:netlify": "pnpm --filter @secretlayer/web build",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
@@ -17,5 +18,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

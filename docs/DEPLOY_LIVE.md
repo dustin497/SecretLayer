@@ -49,11 +49,26 @@ WWH2 ratings auto-migrate from any legacy JSON file on first Postgres boot.
 4. Refresh → launcher should show average rating
 5. `curl https://api.secretlayer.net/wwh2/stats` → `totalSessions` ≥ 1
 
+## Verify Netlify is building this repo (not an old upload)
+
+Live HTML should include:
+
+- Page title: **SecretLayer — WWH2 Guided Help**
+- Footer text: **build 0.2.0-wwh2**
+- WWH2 launcher in the bottom-right corner
+
+If you still see **SecretLayer MVP** and no WWH2, the Netlify build is failing or publish directory is wrong:
+
+1. Netlify → **Deploys** → open latest deploy log on `main`
+2. Confirm **Published directory** is `apps/web/dist` (from `netlify.toml`)
+3. If build failed on `esbuild`, pull latest `main` (includes `pnpm.onlyBuiltDependencies`)
+4. **Clear cache and deploy site**
+
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
-| WWH2 launcher missing | Netlify still on old build — trigger **Clear cache and deploy** |
+| WWH2 launcher missing | Netlify still on old build — check deploy logs, then **Clear cache and deploy** |
 | Ratings don’t persist | Railway missing `DATABASE_URL` — add Postgres plugin |
 | API CORS errors | Set `WEB_ORIGIN=https://secretlayer.net` on Railway |
 | `/api/*` 404 on web | Confirm `_redirects` in build output or `netlify.toml` redirects |
