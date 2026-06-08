@@ -197,6 +197,12 @@ export const WWH2_PLAYBOOKS: Playbook[] = [
         message: "Scroll to Reviews & ratings. Your feedback helps other builders trust the vault before they store keys.",
       },
       {
+        target: "wwh2-open-btn",
+        title: "Try WWH2 first",
+        message:
+          "Click Try WWH2 for free guided help — highlighted steps through vault setup, plans, and more. Rate WWH2 when you are done.",
+      },
+      {
         target: "rate-vault-clarity",
         title: "Rate vault clarity",
         message: "Score how clearly SecretLayer explains encryption, local unlock, and backup behavior.",
@@ -208,14 +214,14 @@ export const WWH2_PLAYBOOKS: Playbook[] = [
       },
       {
         target: "review-form",
-        title: "Submit your review",
+        title: "Rate WWH2",
         message:
           "Add your display name, role, and review text. Never include API keys or secrets — the safety check screens submissions first.",
       },
       {
-        target: "submit-review-btn",
-        title: "Submit",
-        message: "Click Submit review. Screened reviews may appear publicly to help other developers decide.",
+        target: "rate-wwh2-btn",
+        title: "Submit your rating",
+        message: "Click Rate WWH2. Screened reviews may appear publicly to help other developers decide.",
       },
     ],
   },

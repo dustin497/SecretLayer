@@ -301,11 +301,25 @@ export function LandingPage({ onOpenWwh2 }: LandingPageProps) {
 
       <section className="sl-reviews" data-guide="reviews-section">
         <h2>Reviews &amp; ratings</h2>
-        <p className="sl-lead-small">Tell us what feels secure, clear, and worth paying for.</p>
+        <p className="sl-lead-small">Tell us what feels secure, clear, and worth paying for — or get guided help first with WWH2.</p>
         <p className="sl-muted sl-warning">
           Reviews are screened before they appear. Do not include API keys, passwords, private keys, webhook secrets,
           database URLs, encrypted blobs, ciphertext, vault labels, or vault content.
         </p>
+
+        <div className="sl-reviews-actions">
+          <button
+            type="button"
+            className="sl-btn wwh2-cta"
+            data-guide="wwh2-open-btn"
+            onClick={() => onOpenWwh2?.()}
+          >
+            Try WWH2 — free guided help
+          </button>
+          <p className="sl-muted sl-wwh2-hint">
+            In a hurry? WWH2 highlights each step so you finish faster — built by SecretLayer for all users.
+          </p>
+        </div>
 
         <div className="sl-rating-cards">
           <RatingCard
@@ -332,8 +346,8 @@ export function LandingPage({ onOpenWwh2 }: LandingPageProps) {
         </div>
 
         <div className="sl-panel" data-guide="review-form">
-          <h3>Rate SecretLayer</h3>
-          <p className="sl-muted">The safety check runs before your review is accepted on this page.</p>
+          <h3>Rate WWH2</h3>
+          <p className="sl-muted">Share how helpful guided access was — the safety check runs before your review is accepted.</p>
           <label htmlFor="review-name">Display name</label>
           <input id="review-name" value={reviewName} onChange={(e) => setReviewName(e.target.value)} />
           <label htmlFor="review-role">Role</label>
@@ -345,8 +359,8 @@ export function LandingPage({ onOpenWwh2 }: LandingPageProps) {
           />
           <label htmlFor="review-text">Review</label>
           <textarea id="review-text" rows={4} value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
-          <button type="button" className="sl-btn primary" data-guide="submit-review-btn" onClick={submitReview}>
-            Submit review
+          <button type="button" className="sl-btn primary" data-guide="rate-wwh2-btn" onClick={submitReview}>
+            Rate WWH2
           </button>
         </div>
       </section>

@@ -13,7 +13,7 @@ interface WWH2PanelProps {
 }
 
 export function WWH2Panel({ openMenuTrigger = 0 }: WWH2PanelProps) {
-  const [view, setView] = useState<PanelView>("launcher");
+  const [view, setView] = useState<PanelView>("closed");
   const [activeGuide, setActiveGuide] = useState<ActiveGuide | null>(null);
   const [stats, setStats] = useState<Wwh2Stats | null>(null);
   const [minimized, setMinimized] = useState(false);
@@ -81,7 +81,7 @@ export function WWH2Panel({ openMenuTrigger = 0 }: WWH2PanelProps) {
 
   function closeAll() {
     setActiveGuide(null);
-    setView("launcher");
+    setView("closed");
   }
 
   if (minimized && view !== "guide") {
