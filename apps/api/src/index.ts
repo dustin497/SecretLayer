@@ -1,11 +1,19 @@
 import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { FREE_PLAN_LIMITS } from "@secretlayer/shared";
+import { runPromotionGate } from "@secretlayer/promotion";
+import { fetchHeaders, runSafetySuite } from "@secretlayer/safety-engine";
+import {
+  FREE_PLAN_LIMITS,
+  type WaitlistLead,
+  type Wwh2Feedback,
+  type Wwh2Stats,
+} from "@secretlayer/shared";
 
 const app = express();
 const port = Number(process.env.PORT ?? 8787);
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:5173";
+const appVersion = process.env.APP_VERSION ?? "0.2.0";
 
 app.use(
   cors({
@@ -22,10 +30,18 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// In-memory store for local dev (replace with DB in production)
+const publicLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const users = new Map<string, { id: string; email: string; password: string }>();
 const sessions = new Map<string, string>();
 const projects = new Map<string, { id: string; userId: string; name: string }>();
+const waitlistLeads = new Map<string, WaitlistLead>();
+const wwh2Feedback = new Map<string, Wwh2Feedback>();
 
 function auth(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
@@ -47,8 +63,145 @@ function auth(req: express.Request, res: express.Response, next: express.NextFun
   return res.status(401).json({ error: "Authentication required." });
 }
 
+async function buildSafetyReport(target = "https://secretlayer.net") {
+  const headers = await fetchHeaders(target).catch(() => ({}));
+  return runSafetySuite({
+    targetUrl: target,
+    responseHeaders: headers,
+    config: {
+      jwtSecretSet: Boolean(process.env.JWT_SECRET && process.env.JWT_SECRET !== "change-me-in-production"),
+      encryptionEnabled: true,
+      rateLimitEnabled: true,
+      auditLogEnabled: waitlistLeads.size > 0,
+    },
+  });
+}
+
+function computeWwh2Stats(): Wwh2Stats {
+  const entries = [...wwh2Feedback.values()];
+  const totalSessions = entries.length;
+  const averageRating =
+    totalSessions === 0 ? 0 : entries.reduce((sum, e) => sum + e.rating, 0) / totalSessions;
+  const helpfulCount = entries.filter((e) => e.helpful).length;
+  const helpfulPercent = totalSessions === 0 ? 0 : Math.round((helpfulCount / totalSessions) * 100);
+  const playbookCounts: Record<string, number> = {};
+  for (const entry of entries) {
+    playbookCounts[entry.playbookId] = (playbookCounts[entry.playbookId] ?? 0) + 1;
+  }
+  return { totalSessions, averageRating, helpfulPercent, playbookCounts };
+}
+
+const DEFAULT_HIGHLIGHTS = [
+  "Industry-calibrated safety nets before every promotion",
+  "Vault-first projects for the common builder",
+  "Channel-ready promotion leads after safety clears",
+  "WWH2 guided help — free for all users",
+];
+
 app.get("/health", (_req, res) => {
-  res.json({ ok: true, service: "secretlayer-backend" });
+  res.json({
+    ok: true,
+    service: "secretlayer-backend",
+    version: appVersion,
+    waitlistCount: waitlistLeads.size,
+    wwh2Sessions: wwh2Feedback.size,
+  });
+});
+
+app.get("/wwh2/stats", publicLimiter, (_req, res) => {
+  res.json({ stats: computeWwh2Stats() });
+});
+
+app.post("/wwh2/feedback", publicLimiter, (req, res) => {
+  const { playbookId, playbookTitle, rating, helpful, comment, completedSteps, totalSteps } = req.body ?? {};
+
+  if (!playbookId || typeof playbookId !== "string") {
+    return res.status(400).json({ error: "playbookId required." });
+  }
+  if (typeof rating !== "number" || rating < 1 || rating > 5) {
+    return res.status(400).json({ error: "rating must be 1–5." });
+  }
+  if (typeof helpful !== "boolean") {
+    return res.status(400).json({ error: "helpful must be true or false." });
+  }
+
+  const entry: Wwh2Feedback = {
+    id: crypto.randomUUID(),
+    playbookId,
+    playbookTitle: typeof playbookTitle === "string" ? playbookTitle : playbookId,
+    rating,
+    helpful,
+    comment: typeof comment === "string" && comment.trim() ? comment.trim().slice(0, 2000) : undefined,
+    completedSteps: typeof completedSteps === "number" ? completedSteps : 0,
+    totalSteps: typeof totalSteps === "number" ? totalSteps : 0,
+    createdAt: new Date().toISOString(),
+  };
+
+  wwh2Feedback.set(entry.id, entry);
+
+  res.status(201).json({
+    feedback: entry,
+    stats: computeWwh2Stats(),
+    message: "Thanks — your WWH2 rating helps other developers find guided help faster.",
+  });
+});
+
+app.get("/safety/report", publicLimiter, async (req, res) => {
+  const target = (req.query.target as string) ?? "https://secretlayer.net";
+  try {
+    const report = await buildSafetyReport(target);
+    res.json({ report });
+  } catch (err) {
+    res.status(500).json({ error: "Safety scan failed.", detail: String(err) });
+  }
+});
+
+app.post("/promotion/check", publicLimiter, async (req, res) => {
+  const target = req.body?.target ?? "https://secretlayer.net";
+  const version = req.body?.version ?? appVersion;
+  const highlights = req.body?.highlights ?? DEFAULT_HIGHLIGHTS;
+
+  try {
+    const safetyReport = await buildSafetyReport(target);
+    const result = await runPromotionGate(
+      { version, highlights, safetyReport },
+      { dryRun: true, webhookUrl: process.env.PROMOTION_WEBHOOK_URL },
+    );
+    res.json({ result, safetyReport });
+  } catch (err) {
+    res.status(500).json({ error: "Promotion check failed.", detail: String(err) });
+  }
+});
+
+app.post("/leads/waitlist", publicLimiter, (req, res) => {
+  const { email, source } = req.body ?? {};
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    return res.status(400).json({ error: "Valid email required." });
+  }
+
+  const normalized = email.trim().toLowerCase();
+  const existing = [...waitlistLeads.values()].find((l) => l.email === normalized);
+  if (existing) {
+    return res.json({ lead: existing, message: "Already on the waitlist." });
+  }
+
+  const lead: WaitlistLead = {
+    id: crypto.randomUUID(),
+    email: normalized,
+    source: typeof source === "string" ? source : "web",
+    createdAt: new Date().toISOString(),
+  };
+  waitlistLeads.set(lead.id, lead);
+
+  res.status(201).json({
+    lead,
+    message: "You're on the waitlist — we'll notify you when the upgraded vault ships.",
+    waitlistCount: waitlistLeads.size,
+  });
+});
+
+app.get("/leads/waitlist/count", publicLimiter, (_req, res) => {
+  res.json({ count: waitlistLeads.size });
 });
 
 app.post("/auth/signup", authLimiter, (req, res) => {

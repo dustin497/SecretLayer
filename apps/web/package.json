@@ -12,6 +12,7 @@
     "lint": "node -e \"process.exit(0)\""
   },
   "dependencies": {
+    "@secretlayer/shared": "workspace:*",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

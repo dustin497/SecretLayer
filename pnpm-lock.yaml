@@ -10,6 +10,12 @@ importers:
 
   apps/api:
     dependencies:
+      '@secretlayer/promotion':
+        specifier: workspace:*
+        version: link:../../packages/promotion
+      '@secretlayer/safety-engine':
+        specifier: workspace:*
+        version: link:../../packages/safety-engine
       '@secretlayer/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -41,6 +47,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@secretlayer/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       react:
         specifier: ^19.1.0
         version: 19.2.7
