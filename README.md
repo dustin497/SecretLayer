@@ -41,9 +41,34 @@ Production today runs on **Netlify** (web) and **Railway** (`api.secretlayer.net
 
 See [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md) and [docs/SAFETY_NETS.md](docs/SAFETY_NETS.md).
 
+## WWH2 guided help
+
+Free on-page guided tours for secretlayer.net — spotlight highlights, 7 playbooks, post-guide star ratings.
+
+- Web: floating launcher + **Powered by WWH2** footer badge
+- API: `POST /wwh2/feedback`, `GET /wwh2/stats`
+- Production store: **Postgres** via `DATABASE_URL` (Railway); local dev falls back to `data/wwh2-feedback.json`
+
+## Deploy
+
+| Surface | Host | Config |
+|---------|------|--------|
+| Web | [secretlayer.net](https://secretlayer.net) (Netlify) | `netlify.toml` |
+| API | api.secretlayer.net (Railway) | `railway.toml` |
+
+Push to `main` runs tests in CI. If `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` are set as GitHub secrets, the deploy workflow publishes the web app. Railway redeploys the API when connected to this repo.
+
+**Railway production env (API):**
+
+- `DATABASE_URL` — Postgres plugin connection string
+- `WEB_ORIGIN=https://secretlayer.net`
+- `JWT_SECRET` — strong random secret
+- `NODE_ENV=production`
+
 ## Environment
 
 Copy `.env.example` to `.env`. Key variables:
 
 - `JWT_SECRET` — API auth (required in production)
+- `DATABASE_URL` — Postgres for WWH2 feedback + future persistence (production)
 - `PROMOTION_WEBHOOK_URL` — optional webhook when promotion gate passes

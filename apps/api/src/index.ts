@@ -9,7 +9,7 @@ import {
   type Wwh2Feedback,
   type Wwh2Stats,
 } from "@secretlayer/shared";
-import { Wwh2FeedbackStore } from "./wwh2-store.js";
+import { createWwh2Store, type Wwh2FeedbackStore } from "./wwh2-store.js";
 
 const app = express();
 const port = Number(process.env.PORT ?? 8787);
@@ -42,7 +42,7 @@ const users = new Map<string, { id: string; email: string; password: string }>()
 const sessions = new Map<string, string>();
 const projects = new Map<string, { id: string; userId: string; name: string }>();
 const waitlistLeads = new Map<string, WaitlistLead>();
-const wwh2Store = new Wwh2FeedbackStore();
+let wwh2Store: Wwh2FeedbackStore;
 
 function auth(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
@@ -78,8 +78,8 @@ async function buildSafetyReport(target = "https://secretlayer.net") {
   });
 }
 
-function computeWwh2Stats(): Wwh2Stats {
-  const entries = wwh2Store.getAll();
+async function computeWwh2Stats(): Promise<Wwh2Stats> {
+  const entries = await wwh2Store.getAll();
   const totalSessions = entries.length;
   const averageRating =
     totalSessions === 0 ? 0 : entries.reduce((sum, e) => sum + e.rating, 0) / totalSessions;
@@ -99,18 +99,19 @@ const DEFAULT_HIGHLIGHTS = [
   "WWH2 guided help — free for all users",
 ];
 
-app.get("/health", (_req, res) => {
+app.get("/health", async (_req, res) => {
   res.json({
     ok: true,
     service: "secretlayer-backend",
     version: appVersion,
     waitlistCount: waitlistLeads.size,
-    wwh2Sessions: wwh2Store.size,
+    wwh2Sessions: wwh2Store ? await wwh2Store.count() : 0,
+    wwh2Store: process.env.DATABASE_URL ? "postgres" : "file",
   });
 });
 
-app.get("/wwh2/stats", publicLimiter, (_req, res) => {
-  res.json({ stats: computeWwh2Stats() });
+app.get("/wwh2/stats", publicLimiter, async (_req, res) => {
+  res.json({ stats: await computeWwh2Stats() });
 });
 
 app.post("/wwh2/feedback", publicLimiter, async (req, res) => {
@@ -142,7 +143,7 @@ app.post("/wwh2/feedback", publicLimiter, async (req, res) => {
     await wwh2Store.add(entry);
     res.status(201).json({
       feedback: entry,
-      stats: computeWwh2Stats(),
+      stats: await computeWwh2Stats(),
       message: "Thanks — your WWH2 rating helps other developers find guided help faster.",
     });
   } catch (err) {
@@ -274,6 +275,7 @@ app.get("/vault-items", auth, (_req, res) => {
   res.json({ vaultItems: [] });
 });
 
+wwh2Store = await createWwh2Store();
 await wwh2Store.load();
 
 app.listen(port, () => {
