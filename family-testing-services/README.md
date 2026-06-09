@@ -1,6 +1,6 @@
 # Family Testing Services Website
 
-Live at **https://mirrorpathai.com** (temporary root domain).
+Live at **https://dustin497.github.io/SecretLayer/** (GitHub Pages) after deploy runs.
 
 ## Public pages
 
