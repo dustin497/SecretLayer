@@ -1,6 +1,6 @@
 # Family Testing Services Website
 
-Live at **https://dustin497.github.io/SecretLayer/** (GitHub Pages) after deploy runs.
+Live at **https://family-testing.com** after GoDaddy DNS is pointed (see `GODADDY_DNS.md`).
 
 ## Public pages
 
