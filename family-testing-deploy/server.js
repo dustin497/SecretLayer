@@ -14,6 +14,10 @@ app.get("/admin/js/auth-config.js", (_req, res) => {
 
 app.use(express.static(publicDir));
 
+app.get("/health", (_req, res) => {
+  res.status(200).send("ok");
+});
+
 app.get("/", (_req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
