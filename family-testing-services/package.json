@@ -1,0 +1,15 @@
+{
+  "name": "family-testing-services",
+  "version": "1.0.0",
+  "description": "Family Testing Services — drug testing clinic website, Bessemer AL",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,27 +1,30 @@
-# Family Testing Services Website
+# Family Testing Services — GoDaddy Upload Package
 
-Live at **https://family-testing.com** after GoDaddy DNS is pointed (see `GODADDY_DNS.md`).
+## Upload to GoDaddy Node.js Hosting
 
-## Public pages
+1. Zip **this entire folder** (`family-testing-services`)
+2. GoDaddy → **Node.js Hosting** → upload the folder
+3. Platform runs `npm install` then `npm start` automatically
+4. Publish and connect **family-testing.com**
 
-- `index.html` — Home
-- `about.html` — About
-
-## Staff admin (password protected)
-
-- **URL:** `/admin/`
-- **Password:** `fts2026`
-- **Documents:**
-  - Proof of Testing (chain of custody) — print when test is conducted
-  - Test Results Negative — print clean results report
-
-## Local preview
+## Test locally first
 
 ```bash
-cd family-testing-services
-python3 -m http.server 8080
+npm install
+npm start
 ```
 
-## Netlify deploy
+Open http://localhost:3000
 
-Publish directory: `family-testing-services` · Custom domain: `mirrorpathai.com`
+## URLs after deploy
+
+| | |
+|---|---|
+| Website | https://family-testing.com |
+| Staff admin | https://family-testing.com/admin/ |
+| Password | `fts2026` |
+
+## Printable documents (admin only)
+
+- Proof of Testing — chain of custody form
+- Test Results — negative/clean report
