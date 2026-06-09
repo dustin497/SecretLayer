@@ -1,14 +1,12 @@
 # Host Family Testing Services on GoDaddy
 
-DuckDuckGo is a search engine — it does not host websites. GoDaddy **does** sell domain names and cheap hosting that works perfectly for this static site.
+**Your domain:** `family-testing.com`
 
-## Step 1 — Buy a domain at GoDaddy
+See **`GODADDY_DNS.md`** for DNS records to connect the domain to the live site.
 
-Good options (check availability at [godaddy.com](https://www.godaddy.com)):
+## Step 1 — Domain (done)
 
-- `familytestingservices.com`
-- `familytestingbessemer.com`
-- `familytestingal.com`
+You purchased `family-testing.com` at GoDaddy.
 
 ## Step 2 — Get hosting
 
