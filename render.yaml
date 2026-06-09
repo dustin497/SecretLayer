@@ -4,6 +4,7 @@ services:
     runtime: node
     plan: free
     region: ohio
+    repo: https://github.com/dustin497/SecretLayer
     branch: render-deploy
     buildCommand: npm install && npm run build
     startCommand: npm start

@@ -1,9 +1,24 @@
-# Family Testing Services — Standalone Deploy Package
+# Family Testing Services
 
-Upload **this entire folder** to GoDaddy Node.js Hosting.
-Self-contained — no monorepo, no pnpm workspaces.
+Drug testing clinic website — Bessemer, AL.
 
-## GoDaddy runs: npm install → npm run build → npm start
+## Deploy to Render (one click)
 
-- Website: https://family-testing.com
-- Admin: https://family-testing.com/admin/ (password: fts2026)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/dustin497/SecretLayer/tree/render-deploy)
+
+After deploy:
+
+- Site: `https://family-testing-services.onrender.com`
+- Health: `/health` → `ok`
+- Admin: `/admin/` (password: `fts2026` or set `ADMIN_PASSWORD` in Render)
+
+## API deploy (agent / CI)
+
+```bash
+export RENDER_API_KEY=rnd_...
+node scripts/deploy-to-render.mjs
+```
+
+## GoDaddy Node.js Hosting
+
+Upload this folder, then run: `npm install && npm run build && npm start`
