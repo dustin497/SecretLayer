@@ -3,6 +3,7 @@ name: Deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-main
@@ -22,25 +23,22 @@ jobs:
       - run: pnpm build
       - run: pnpm test
 
-  netlify:
+  netlify-family-testing:
     needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
-      - run: pnpm install
-      - run: pnpm --filter @secretlayer/web build
-      - name: Deploy to Netlify
+      - name: Deploy Family Testing Services to Netlify
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
           if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
-            echo "Netlify secrets not set — skip CLI deploy (Git-linked Netlify may still auto-build main)."
+            echo "::warning::Netlify secrets missing — add NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID in GitHub repo secrets."
+            echo "::warning::Or link mirrorpathai.com in Netlify UI to this repo (see family-testing-services/NETLIFY_SETUP.md)."
             exit 0
           fi
-          npx netlify-cli@23 deploy --prod --dir=apps/web/dist --site="$NETLIFY_SITE_ID" --message "Deploy ${{ github.sha }}"
+          npx netlify-cli@23 deploy --prod --dir=family-testing-services --site="$NETLIFY_SITE_ID" --message "Family Testing Services ${{ github.sha }}"

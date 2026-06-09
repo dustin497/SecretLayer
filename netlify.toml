@@ -1,6 +1,8 @@
 [build]
-  command = "echo 'Family Testing Services — static site, no build step'"
+  command = "echo 'Family Testing Services — static site, no build step required'"
   publish = "family-testing-services"
+
+# If Netlify base directory is set to family-testing-services/, use publish = "." in that folder's netlify.toml instead.
 
 [build.environment]
   NODE_VERSION = "22"
