@@ -1,6 +1,6 @@
 (function () {
   const ADMIN_KEY = "fts_admin_auth";
-  const ADMIN_PASSWORD = "fts2026";
+  const ADMIN_PASSWORD = window.__FTS_ADMIN_PASSWORD__ || "";
 
   window.FTSAdmin = {
     login(password) {
