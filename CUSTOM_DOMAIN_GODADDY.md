@@ -14,6 +14,23 @@ Or sync the blueprint — `render.yaml` already includes `family-testing.com`.
 
 ## Step 2 — Update GoDaddy DNS
 
+### Option A — Import zone file (recommended)
+
+1. **Delete conflicts first** (GoDaddy → DNS):
+   - All **A** records for `@`
+   - All **CNAME** records for `www`
+   - **Forwarding** rules (Domain → Forwarding → delete)
+   - Any **AAAA** records
+
+2. **Import zone file:**
+   - GoDaddy → **family-testing.com** → **DNS** → **Actions** → **Import Zone File**
+   - Upload: `dns/family-testing.com.zone` from this repo
+   - Click **Apply Zone File**
+
+3. If import fails, delete the conflicting records GoDaddy lists and try again.
+
+### Option B — Manual records
+
 Go to **GoDaddy** → **family-testing.com** → **DNS** → **Manage DNS**
 
 **Remove** (if present):

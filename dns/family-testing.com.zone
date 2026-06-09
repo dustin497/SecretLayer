@@ -1,0 +1,11 @@
+; DNS zone for family-testing.com -> Render
+; Import into GoDaddy AFTER deleting conflicting records (see CUSTOM_DOMAIN_GODADDY.md)
+
+$TTL 600
+$ORIGIN family-testing.com.
+
+; Root domain -> Render load balancer
+@       IN      A       216.24.57.1
+
+; www -> Render service
+www     IN      CNAME   family-testing-services.onrender.com.
