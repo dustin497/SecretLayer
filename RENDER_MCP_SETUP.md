@@ -5,9 +5,19 @@
 1. Open **https://dashboard.render.com/u/settings#api-keys**
 2. **Create API Key** → copy it
 
-## Step 2 — Add to Cursor
+## Step 2 — Install MCP server (optional local binary)
 
-Open **Cursor Settings** → **MCP** → **Add server** (or edit `~/.cursor/mcp.json`):
+```bash
+curl -fsSL https://raw.githubusercontent.com/render-oss/render-mcp-server/refs/heads/main/bin/install.sh | sh
+export PATH=$PATH:$HOME/.local/bin
+render-mcp-server --version
+```
+
+## Step 3 — Add to Cursor
+
+Open **Cursor Settings** → **MCP** → **Add server** (or edit `~/.cursor/mcp.json`).
+
+**Option A — Hosted (simplest):**
 
 ```json
 {
@@ -22,13 +32,29 @@ Open **Cursor Settings** → **MCP** → **Add server** (or edit `~/.cursor/mcp.
 }
 ```
 
-Replace `YOUR_API_KEY_HERE` with your real key.
+**Option B — Local binary (after install script above):**
 
-## Step 3 — Restart Cursor
+```json
+{
+  "mcpServers": {
+    "render": {
+      "command": "/home/ubuntu/.local/bin/render-mcp-server",
+      "args": ["-t", "stdio"],
+      "env": {
+        "RENDER_API_KEY": "YOUR_API_KEY_HERE"
+      }
+    }
+  }
+}
+```
+
+Replace `YOUR_API_KEY_HERE` with your real key. For cloud agents, also add `RENDER_API_KEY` as a **Cursor secret**.
+
+## Step 4 — Restart Cursor
 
 Fully quit and reopen Cursor.
 
-## Step 4 — Tell the agent
+## Step 5 — Tell the agent
 
 Say: **"Deploy family-testing-services on Render from branch render-deploy"**
 
