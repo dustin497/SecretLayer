@@ -18,7 +18,11 @@ function Require-Command($name, $hint) {
 }
 
 Require-Command node "Install Node.js 20+ from https://nodejs.org/"
-Require-Command pnpm "Run: corepack enable && corepack prepare pnpm@10.33.3 --activate"
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+    corepack enable | Out-Null
+    corepack prepare pnpm@10.33.3 --activate | Out-Null
+}
+Require-Command pnpm "Run: corepack enable, then corepack prepare pnpm@10.33.3 --activate"
 Require-Command cargo "Install Rust from https://rustup.rs/"
 Require-Command rustc "Install Rust from https://rustup.rs/"
 

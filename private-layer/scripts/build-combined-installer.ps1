@@ -24,7 +24,11 @@ function Require-Command($name, $hint) {
 }
 
 Require-Command node "https://nodejs.org/"
-Require-Command pnpm "corepack enable && corepack prepare pnpm@10.33.3 --activate"
+if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
+    corepack enable | Out-Null
+    corepack prepare pnpm@10.33.3 --activate | Out-Null
+}
+Require-Command pnpm "Run: corepack enable, then corepack prepare pnpm@10.33.3 --activate"
 Require-Command cargo "https://rustup.rs/"
 Require-Command python "https://www.python.org/ — needed on target PCs for agent"
 
