@@ -1,0 +1,5 @@
+{
+  "instruction": "Create a weekly task document for launching a client onboarding SOP",
+  "input": "Client: Acme. Need: intake form, kickoff call template, delivery checklist.",
+  "output": "# Week plan — Acme onboarding\n\n## Monday\n- Draft intake form in profiles/acme.yaml\n\n## Tuesday\n- Kickoff call template\n\n## Wednesday\n- Delivery checklist + review\n\n```action\n{\"tool\": \"write_markdown\", \"args\": {\"path\": \"plans/acme-onboarding-week.md\", \"content\": \"# Week plan — Acme onboarding\\n\\n## Monday\\n- Draft intake form\\n\"}}\n```"
+}
