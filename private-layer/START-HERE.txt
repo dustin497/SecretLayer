@@ -1,11 +1,8 @@
-PRIVATE LAYER — YOU ARE IN THE RIGHT FOLDER
+PRIVATE LAYER — ONE COMMAND ON YOUR WINDOWS PC
 
-Next steps on Windows (PowerShell):
+  cd private-layer
+  powershell -ExecutionPolicy Bypass -File scripts\run-all-windows.ps1
 
-  1. scripts\windows-setup.ps1
-  2. ollama pull qwen2.5:7b
-  3. packages\agent\.venv\Scripts\python.exe -m agent serve   (keep open)
-  4. pnpm install && pnpm tauri dev   (opens the app window)
+That runs setup, Ollama check, agent, and opens the app.
 
-For installer: scripts\build-combined-installer.ps1
 Full guide: docs\INSTALL-WINDOWS.md
