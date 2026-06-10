@@ -1,22 +1,36 @@
-# Create Desktop shortcut "PrivateLayer" that starts the full stack
+# Create Desktop shortcut that starts the full PrivateLayer stack
 param(
-    [string]$InstalledExe = "$env:LOCALAPPDATA\Programs\PrivateLayer\PrivateLayer.exe"
+    [string]$InstalledExe = "$env:LOCALAPPDATA\PrivateLayer\PrivateLayer.exe",
+    [string]$InstallDir = "$env:LOCALAPPDATA\PrivateLayer"
 )
 
 $ErrorActionPreference = "Stop"
-$Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+
+if (-not (Test-Path $InstalledExe)) {
+    $InstalledExe = Join-Path $InstallDir "PrivateLayer.exe"
+}
+
+$Root = if (Test-Path $InstallDir) { $InstallDir } else {
+    Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+}
+
 $Launcher = Join-Path $Root "scripts\start-private-layer.ps1"
+if (-not (Test-Path $Launcher)) {
+    throw "Launcher not found: $Launcher"
+}
+
 $Desktop = [Environment]::GetFolderPath("Desktop")
 $ShortcutPath = Join-Path $Desktop "PrivateLayer.lnk"
 
 $Wsh = New-Object -ComObject WScript.Shell
 $Sc = $Wsh.CreateShortcut($ShortcutPath)
 $Sc.TargetPath = "powershell.exe"
-$Sc.Arguments = "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Launcher`" -InstalledExe `"$InstalledExe`""
+$Sc.Arguments = "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Launcher`" -InstallDir `"$Root`" -InstalledExe `"$InstalledExe`""
 $Sc.WorkingDirectory = $Root
-$Sc.IconLocation = "$InstalledExe,0"
-$Sc.Description = "PrivateLayer — Dark Side vault"
+if (Test-Path $InstalledExe) {
+    $Sc.IconLocation = "$InstalledExe,0"
+}
+$Sc.Description = "PrivateLayer — Dark Side vault (Ollama + agent + app)"
 $Sc.Save()
 
-Write-Host "Shortcut created: $ShortcutPath" -ForegroundColor Green
-Write-Host "Double-click PrivateLayer on your desktop to start." -ForegroundColor Green
+Write-Host "Shortcut: $ShortcutPath" -ForegroundColor Green

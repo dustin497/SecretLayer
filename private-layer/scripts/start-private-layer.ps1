@@ -1,48 +1,62 @@
-# Start full PrivateLayer stack: agent sidecar + desktop app
-# Use after installing PrivateLayer and running windows-setup.ps1 once.
-#
-#   powershell -ExecutionPolicy Bypass -File scripts\start-private-layer.ps1
-#
-# Optional: pass -InstalledExe if you installed via NSIS to Program Files
-
+# Start full PrivateLayer stack: Ollama + agent + desktop app
 param(
-    [string]$InstalledExe = ""
+    [string]$InstalledExe = "",
+    [string]$InstallDir = ""
 )
 
 $ErrorActionPreference = "Stop"
-$Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
-# Load .env from repo or vault
-$envFile = Join-Path $Root ".env"
-if (Test-Path $envFile) {
-    Get-Content $envFile | ForEach-Object {
-        if ($_ -match "^\s*([^#][^=]+)=(.*)$") {
-            [System.Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim(), "Process")
+# Resolve install root
+if ($InstallDir -and (Test-Path $InstallDir)) {
+    $Root = $InstallDir
+} elseif ($env:PRIVATE_LAYER_HOME -and (Test-Path $env:PRIVATE_LAYER_HOME)) {
+    $Root = $env:PRIVATE_LAYER_HOME
+} elseif (Test-Path "$env:LOCALAPPDATA\PrivateLayer\PrivateLayer.exe") {
+    $Root = "$env:LOCALAPPDATA\PrivateLayer"
+} else {
+    $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+}
+
+# Load .env — prefer installed config\, then repo .env
+$envCandidates = @(
+    (Join-Path $Root "config\.env"),
+    (Join-Path $Root ".env")
+)
+foreach ($envFile in $envCandidates) {
+    if (Test-Path $envFile) {
+        Get-Content $envFile | ForEach-Object {
+            if ($_ -match "^\s*([^#][^=]+)=(.*)$") {
+                [System.Environment]::SetEnvironmentVariable($matches[1].Trim(), $matches[2].Trim(), "Process")
+            }
         }
+        break
     }
 }
 
 $vaultRoot = $env:VAULT_ROOT
 if ($vaultRoot -and -not (Test-Path $vaultRoot)) {
-    Write-Host "Vault not mounted: $vaultRoot" -ForegroundColor Yellow
-    Write-Host "Mount VeraCrypt first, or edit .env VAULT_ROOT" -ForegroundColor Yellow
+    Write-Host "Vault not mounted: $vaultRoot — mount VeraCrypt or edit config\.env" -ForegroundColor Yellow
 }
 
-# 1) Ollama (if installed)
+# 1) Ollama
 if (Get-Command ollama -ErrorAction SilentlyContinue) {
-    $ollamaProc = Get-Process ollama -ErrorAction SilentlyContinue
-    if (-not $ollamaProc) {
-        Write-Host "Starting Ollama..." -ForegroundColor Gray
+    if (-not (Get-Process ollama -ErrorAction SilentlyContinue)) {
         Start-Process ollama -ArgumentList "serve" -WindowStyle Hidden
         Start-Sleep -Seconds 2
     }
 } else {
-    Write-Host "Ollama not found — install from https://ollama.com" -ForegroundColor Yellow
+    Write-Host "Ollama not installed: https://ollama.com/download/windows" -ForegroundColor Yellow
 }
 
-# 2) Python agent
-$agentPython = Join-Path $Root "packages\agent\.venv\Scripts\python.exe"
-if (Test-Path $agentPython) {
+# 2) Agent — installed layout uses agent\ not packages\agent\
+$agentCandidates = @(
+    (Join-Path $Root "agent\.venv\Scripts\python.exe"),
+    (Join-Path $Root "packages\agent\.venv\Scripts\python.exe")
+)
+$agentPython = $agentCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+$agentDir = if ($agentPython) { Split-Path (Split-Path (Split-Path $agentPython)) } else { Join-Path $Root "agent" }
+
+if ($agentPython) {
     $agentRunning = $false
     try {
         $r = Invoke-WebRequest -Uri "http://127.0.0.1:8790/health" -UseBasicParsing -TimeoutSec 2
@@ -50,35 +64,31 @@ if (Test-Path $agentPython) {
     } catch { }
 
     if (-not $agentRunning) {
-        Write-Host "Starting PrivateLayer agent on :8790..." -ForegroundColor Gray
-        $agentDir = Join-Path $Root "packages\agent"
+        $env:PYTHONPATH = Join-Path $agentDir "src"
         Start-Process -FilePath $agentPython -ArgumentList "-m", "agent", "serve" -WorkingDirectory $agentDir -WindowStyle Hidden
         Start-Sleep -Seconds 2
     }
 } else {
-    Write-Host "Agent not set up. Run scripts\windows-setup.ps1 first." -ForegroundColor Yellow
+    Write-Host "Agent not ready — re-run scripts\installer\post-install.ps1" -ForegroundColor Yellow
 }
 
-# 3) Desktop app
-if ($InstalledExe -and (Test-Path $InstalledExe)) {
-    Write-Host "Launching installed PrivateLayer..." -ForegroundColor Green
+# 3) Desktop
+if (-not $InstalledExe) {
+    $InstalledExe = Join-Path $Root "PrivateLayer.exe"
+}
+if (-not (Test-Path $InstalledExe)) {
+    $InstalledExe = Join-Path $Root "apps\desktop\src-tauri\target\release\private-layer-desktop.exe"
+}
+
+if (Test-Path $InstalledExe) {
     Start-Process $InstalledExe
     exit 0
 }
 
-$devExe = Join-Path $Root "apps\desktop\src-tauri\target\release\private-layer-desktop.exe"
-if (Test-Path $devExe) {
-    Write-Host "Launching PrivateLayer (release build)..." -ForegroundColor Green
-    Start-Process $devExe
-    exit 0
-}
-
-# Fallback: dev mode
 if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-    Write-Host "No release .exe found — starting dev mode (pnpm tauri dev)..." -ForegroundColor Yellow
     Set-Location $Root
     pnpm tauri dev
 } else {
-    Write-Host "Install PrivateLayer via the NSIS .exe from build-windows-installer.ps1" -ForegroundColor Red
+    Write-Host "PrivateLayer.exe not found. Run build-combined-installer.ps1" -ForegroundColor Red
     exit 1
 }

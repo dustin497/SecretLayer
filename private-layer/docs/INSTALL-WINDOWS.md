@@ -62,28 +62,46 @@ copy .env.example V:\PrivateLayer\.env
 
 ---
 
-## Part B — Build the Windows installer
+## Part B — Build the **combined** installer (recommended)
 
-On your Windows machine (needs Rust + VS Build Tools):
+One installer sets up **everything** (no secrets bundled):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-combined-installer.ps1
+```
+
+### What you get
+
+| Output | When |
+|--------|------|
+| **`dist\PrivateLayer-Setup-0.1.0.exe`** | Inno Setup 6 installed on build PC (best) |
+| **`dist\PrivateLayer-Setup-0.1.0.zip`** | Fallback if Inno not installed |
+
+### Install like any Windows app
+
+1. Double-click **`PrivateLayer-Setup-0.1.0.exe`**
+2. Wizard installs to `%LOCALAPPDATA%\PrivateLayer\`
+3. Post-install automatically:
+   - Creates Python agent virtualenv + `pip install`
+   - Checks **Ollama** (offers to open download page if missing)
+   - Runs **GPU detect** → saves `config\gpu-recommendation.txt`
+   - Creates **desktop shortcut**
+   - Creates `config\.env` from template (you add vault path — no secrets pre-filled)
+
+### Zip fallback
+
+```powershell
+# Extract zip, then:
+powershell -ExecutionPolicy Bypass -File Install-PrivateLayer.ps1
+```
+
+### Old desktop-only build (optional)
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\build-windows-installer.ps1
 ```
 
-When it finishes, you get **two** installers in:
-
-```
-apps\desktop\src-tauri\target\release\bundle\nsis\PrivateLayer_0.1.0_x64-setup.exe   ← use this
-apps\desktop\src-tauri\target\release\bundle\msi\PrivateLayer_0.1.0_x64_en-US.msi
-```
-
-### Install like any Windows app
-
-1. Double-click **`PrivateLayer_0.1.0_x64-setup.exe`**
-2. Click through the wizard (installs for current user by default)
-3. Default location: `%LOCALAPPDATA%\Programs\PrivateLayer\PrivateLayer.exe`
-
-The installer is **only the desktop shell**. Ollama + the Python agent are separate (privacy + updates).
+That NSIS build is desktop-only; prefer **build-combined-installer.ps1**.
 
 ---
 
@@ -91,7 +109,7 @@ The installer is **only the desktop shell**. Ollama + the Python agent are separ
 
 ### Option 1 — Desktop shortcut (easiest)
 
-After installing:
+The **combined installer** creates this automatically. Or manually:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\create-desktop-shortcut.ps1
@@ -111,14 +129,14 @@ cd packages\agent
 .\.venv\Scripts\python.exe -m agent serve
 
 # Terminal 2 — or use installed exe
-& "$env:LOCALAPPDATA\Programs\PrivateLayer\PrivateLayer.exe"
+& "$env:LOCALAPPDATA\PrivateLayer\PrivateLayer.exe"
 ```
 
 ### Option 3 — One script
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\start-private-layer.ps1 `
-  -InstalledExe "$env:LOCALAPPDATA\Programs\PrivateLayer\PrivateLayer.exe"
+  -InstallDir "$env:LOCALAPPDATA\PrivateLayer"
 ```
 
 ---
@@ -149,13 +167,14 @@ If Agent offline: run `python -m agent serve` in `packages\agent`
 
 ---
 
-## What the installer does NOT include
+## What the combined installer does NOT bundle
 
-| Not bundled | You install separately |
-|-------------|------------------------|
-| Ollama + model weights | ollama.com |
-| Python agent | `windows-setup.ps1` |
-| VeraCrypt | veracrypt.fr |
-| Obsidian | obsidian.md |
+| Not bundled | Why |
+|-------------|-----|
+| **API keys / passwords** | You put these in `config\.env` or VeraCrypt only |
+| **Ollama binary** | Installer checks + opens download; you install once |
+| **Model weights** | Large; you `ollama pull` after GPU detect |
+| **VeraCrypt** | You create encrypted vault separately |
+| **Obsidian** | Optional editor for vault markdown |
 
-This keeps your **models and secrets** under your control, not inside a single opaque installer.
+Python **is required** on the PC (agent venv is created at install). Ollama is prompted if missing.
