@@ -14,6 +14,67 @@ Write-Host "  PrivateLayer - full setup + launch" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
+function Refresh-NodePath {
+    $nodeDir = Split-Path (Get-Command node).Source -Parent
+    $env:PATH = "$nodeDir;$env:PATH"
+    try {
+        $npmRoot = npm root -g 2>$null
+        if ($npmRoot) {
+            $npmBin = Split-Path $npmRoot -Parent
+            $env:PATH = "$npmBin;$env:PATH"
+        }
+    } catch { }
+    $roamingNpm = Join-Path $env:APPDATA "npm"
+    if (Test-Path $roamingNpm) {
+        $env:PATH = "$roamingNpm;$env:PATH"
+    }
+}
+
+function Invoke-Pnpm {
+    param([Parameter(ValueFromRemainingArguments = $true)][string[]]$PnpmArgs)
+    Refresh-NodePath
+    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
+        & pnpm @PnpmArgs
+        return $LASTEXITCODE
+    }
+    Write-Host "  Using npx pnpm (pnpm not in PATH)..." -ForegroundColor Gray
+    & npx --yes pnpm@10.33.3 @PnpmArgs
+    return $LASTEXITCODE
+}
+
+function Ensure-Pnpm {
+    Refresh-NodePath
+    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
+        Write-Host "  OK  pnpm" -ForegroundColor Green
+        return
+    }
+
+    Write-Host "  pnpm not found - trying to install..." -ForegroundColor Gray
+
+    if (Get-Command corepack -ErrorAction SilentlyContinue) {
+        try {
+            corepack enable 2>$null | Out-Null
+            corepack prepare pnpm@10.33.3 --activate 2>$null | Out-Null
+        } catch { }
+        Refresh-NodePath
+        if (Get-Command pnpm -ErrorAction SilentlyContinue) {
+            Write-Host "  OK  pnpm (via corepack)" -ForegroundColor Green
+            return
+        }
+    }
+
+    Write-Host "  Installing pnpm globally via npm..." -ForegroundColor Gray
+    npm install -g pnpm@10.33.3
+    Refresh-NodePath
+
+    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
+        Write-Host "  OK  pnpm (via npm install -g)" -ForegroundColor Green
+        return
+    }
+
+    Write-Host "  OK  pnpm (will use npx fallback)" -ForegroundColor Yellow
+}
+
 function Need($name, $hint) {
     if (-not (Get-Command $name -ErrorAction SilentlyContinue)) {
         Write-Host "MISSING: $name" -ForegroundColor Red
@@ -21,26 +82,6 @@ function Need($name, $hint) {
         exit 1
     }
     Write-Host "  OK  $name" -ForegroundColor Green
-}
-
-function Ensure-Pnpm {
-    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-        Write-Host "  OK  pnpm" -ForegroundColor Green
-        return
-    }
-    if (Get-Command corepack -ErrorAction SilentlyContinue) {
-        Write-Host "  Enabling pnpm via corepack..." -ForegroundColor Gray
-        corepack enable | Out-Null
-        corepack prepare pnpm@10.33.3 --activate | Out-Null
-    }
-    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-        Write-Host "  OK  pnpm" -ForegroundColor Green
-        return
-    }
-    Write-Host "MISSING: pnpm" -ForegroundColor Red
-    Write-Host "  Run: corepack enable" -ForegroundColor Yellow
-    Write-Host "  Then: corepack prepare pnpm@10.33.3 --activate" -ForegroundColor Yellow
-    exit 1
 }
 
 Write-Host "[1/8] Checking prerequisites..." -ForegroundColor Cyan
@@ -62,9 +103,8 @@ if (Test-Path $gpuScript) {
 
 Write-Host ""
 Write-Host "[3/8] Node + Python setup..." -ForegroundColor Cyan
-corepack enable | Out-Null
-corepack prepare pnpm@10.33.3 --activate | Out-Null
-pnpm install
+Invoke-Pnpm install
+if ($LASTEXITCODE -ne 0) { throw "pnpm install failed" }
 
 $agentDir = Join-Path $Root "packages\agent"
 Set-Location $agentDir
@@ -135,7 +175,7 @@ if (Test-Path $installedExe) {
 } elseif (Get-Command cargo -ErrorAction SilentlyContinue) {
     Write-Host "  Starting pnpm tauri dev (first compile takes 5-15 min)..." -ForegroundColor Yellow
     Set-Location $Root
-    pnpm tauri dev
+    Invoke-Pnpm tauri dev
 } else {
     Write-Host "  Install Rust, then run: pnpm tauri dev" -ForegroundColor Red
     Write-Host "  Or build installer: scripts\build-combined-installer.ps1" -ForegroundColor Yellow
