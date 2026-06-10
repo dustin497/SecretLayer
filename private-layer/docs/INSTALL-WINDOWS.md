@@ -144,11 +144,16 @@ powershell -ExecutionPolicy Bypass -File scripts\start-private-layer.ps1 `
 ## Part D — First launch inside the app
 
 1. **Mount VeraCrypt** (`V:`) before opening PrivateLayer
-2. Open PrivateLayer → **Vault Gate**
-3. Enter vault path: `V:\PrivateLayer`
+2. Open PrivateLayer → **Setup wizard** (first run only)
+   - **Browse** your vault folder (or type `V:\PrivateLayer`)
+   - **Pick Ollama model** from dropdown (or choose a default for later)
+   - Click **Enter PrivateLayer** — saves `config\settings.json` + `config\.env` (no secrets)
+3. **Vault Gate** → vault path is pre-filled from wizard
 4. Enter your vault password → **Enter Dark Side**
 5. Open **Assistant** → type a message
 6. Status bar should show **LLM online** and **Agent online**
+
+Re-run wizard anytime: **Vault Gate** → “Re-run setup wizard”, or **Settings** → “Open setup wizard”.
 
 If LLM offline: `ollama serve` and `ollama pull <your model>`  
 If Agent offline: run `python -m agent serve` in `packages\agent`

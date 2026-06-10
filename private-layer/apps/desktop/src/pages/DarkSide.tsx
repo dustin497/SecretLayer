@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import type { VaultSession } from "../App";
+import type { AppConfig } from "../types/config";
 import { AssistantPanel } from "../components/AssistantPanel";
 import { Sidebar } from "../components/Sidebar";
+import { primaryBtn } from "../styles/forms";
 
 type Props = {
   session: VaultSession;
   onLock: () => void;
+  onOpenSetup: () => void;
 };
 
 type SystemStatus = {
@@ -18,7 +21,7 @@ type SystemStatus = {
 
 type View = "assistant" | "documents" | "profiles" | "training" | "network" | "settings";
 
-export function DarkSide({ session, onLock }: Props) {
+export function DarkSide({ session, onLock, onOpenSetup }: Props) {
   const [view, setView] = useState<View>("assistant");
   const [status, setStatus] = useState<SystemStatus | null>(null);
 
@@ -58,11 +61,11 @@ export function DarkSide({ session, onLock }: Props) {
         </header>
 
         {view === "assistant" && <AssistantPanel />}
-        {view === "documents" && <Placeholder title="Documents" hint="Obsidian vault + PDF import. Open vault folder from Settings." />}
-        {view === "profiles" && <Placeholder title="Business Profiles" hint="YAML/MD structured company profiles. Agent can read and update." />}
-        {view === "training" && <Placeholder title="Training Pipeline" hint="Run packages/trainer on your GPU. Export edits → fine-tune → load in Ollama." />}
+        {view === "documents" && <Placeholder title="Documents" hint="Obsidian vault lives at vault\ inside your vault path. Open from Explorer." />}
+        {view === "profiles" && <Placeholder title="Business Profiles" hint="YAML profiles in vault\profiles. Agent can read and update." />}
+        {view === "training" && <Placeholder title="Model Training" hint="Export edits to training\raw, then python -m trainer prepare && finetune." />}
         {view === "network" && <NetworkLab />}
-        {view === "settings" && <SettingsPanel />}
+        {view === "settings" && <SettingsPanel onOpenSetup={onOpenSetup} />}
       </main>
     </div>
   );
@@ -82,15 +85,7 @@ function viewTitle(view: View): string {
 
 function Placeholder({ title, hint }: { title: string; hint: string }) {
   return (
-    <section
-      style={{
-        background: "#0c0c14",
-        border: "1px dashed #374151",
-        borderRadius: 12,
-        padding: "2rem",
-        color: "#9ca3af",
-      }}
-    >
+    <section style={{ background: "#0c0c14", border: "1px dashed #374151", borderRadius: 12, padding: "2rem", color: "#9ca3af" }}>
       <h2 style={{ marginTop: 0, color: "#e5e7eb" }}>{title}</h2>
       <p>{hint}</p>
     </section>
@@ -102,31 +97,35 @@ function NetworkLab() {
     <section style={{ background: "#0c0c14", border: "1px solid #374151", borderRadius: 12, padding: "1.5rem" }}>
       <h2 style={{ marginTop: 0 }}>Network Lab (isolated)</h2>
       <p style={{ color: "#9ca3af", lineHeight: 1.6 }}>
-        Curiosity browsing belongs in a <strong>separate sandbox</strong> — not inside your document agent.
-        Use Tor Browser inside a VM or a dedicated VeraCrypt session. Never mix vault files with untrusted network content.
+        Use Tor Browser in a VM or Windows Sandbox — never inside the document agent.
       </p>
-      <ul style={{ color: "#d1d5db", lineHeight: 1.8 }}>
-        <li>Install Tor Browser in a Windows Sandbox or spare VM</li>
-        <li>Do not store vault passwords or models in that environment</li>
-        <li>See <code>docs/NETWORK_ISOLATION.md</code> for the full setup</li>
-      </ul>
-      <p style={{ fontSize: "0.85rem", color: "#6b7280" }}>
-        PrivateLayer does not embed a dark-web browser — isolation protects your Dark Side data.
-      </p>
+      <p style={{ fontSize: "0.85rem", color: "#6b7280" }}>See docs/NETWORK_ISOLATION.md in the install folder.</p>
     </section>
   );
 }
 
-function SettingsPanel() {
+function SettingsPanel({ onOpenSetup }: { onOpenSetup: () => void }) {
+  const [cfg, setCfg] = useState<AppConfig | null>(null);
+
+  useEffect(() => {
+    invoke<AppConfig>("get_app_config").then(setCfg).catch(() => undefined);
+  }, []);
+
+  if (!cfg) return <p style={{ color: "#9ca3af" }}>Loading settings…</p>;
+
   return (
     <section style={{ display: "grid", gap: "1rem", maxWidth: 560 }}>
-      <SettingRow label="Ollama host" value="http://127.0.0.1:11434" />
-      <SettingRow label="Default model" value="dolphin-mistral:latest (change in .env)" />
-      <SettingRow label="System prompt" value="vault-templates/system-prompt.txt — you edit this" />
-      <SettingRow label="Action approval" value="REQUIRE_ACTION_APPROVAL=true" />
+      <SettingRow label="Vault path" value={cfg.vaultRoot} />
+      <SettingRow label="Ollama host" value={cfg.ollamaHost} />
+      <SettingRow label="Default model" value={cfg.defaultModel} />
+      <SettingRow label="Action approval" value={cfg.requireActionApproval ? "enabled" : "disabled"} />
+      <SettingRow label="Config files" value="%LOCALAPPDATA%\\PrivateLayer\\config\\settings.json" />
       <p style={{ color: "#6b7280", fontSize: "0.85rem" }}>
-        API keys and secrets: store in .env inside your VeraCrypt volume only. Never commit or paste into assistant chat.
+        API keys: add to config\.env on your VeraCrypt volume only — never in the assistant chat.
       </p>
+      <button type="button" style={primaryBtn} onClick={onOpenSetup}>
+        Open setup wizard
+      </button>
     </section>
   );
 }
@@ -135,7 +134,7 @@ function SettingRow({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ background: "#111118", borderRadius: 8, padding: "1rem" }}>
       <div style={{ fontSize: "0.8rem", color: "#9ca3af" }}>{label}</div>
-      <div style={{ marginTop: "0.25rem", fontFamily: "Consolas, monospace", fontSize: "0.9rem" }}>{value}</div>
+      <div style={{ marginTop: "0.25rem", fontFamily: "Consolas, monospace", fontSize: "0.9rem", wordBreak: "break-all" }}>{value}</div>
     </div>
   );
 }

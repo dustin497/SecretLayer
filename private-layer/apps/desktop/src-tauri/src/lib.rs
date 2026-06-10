@@ -1,3 +1,6 @@
+mod config;
+
+use config::{load_config, save_config, AppConfig};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 use std::sync::Mutex;
@@ -27,10 +30,88 @@ pub struct SystemStatus {
     model: String,
 }
 
+#[derive(Serialize)]
+pub struct OllamaStatus {
+    online: bool,
+    models: Vec<String>,
+}
+
+#[derive(Serialize)]
+pub struct VaultPathStatus {
+    exists: bool,
+    path: String,
+}
+
 fn hash_password(password: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(password.as_bytes());
     hex::encode(hasher.finalize())
+}
+
+#[tauri::command]
+fn is_onboarding_complete() -> bool {
+    load_config().onboarding_complete
+}
+
+#[tauri::command]
+fn get_app_config() -> AppConfig {
+    load_config()
+}
+
+#[tauri::command]
+fn save_app_config(cfg: AppConfig) -> Result<(), String> {
+    save_config(&cfg)?;
+    sync_agent_config(&cfg);
+    Ok(())
+}
+
+fn sync_agent_config(cfg: &AppConfig) {
+    let client = reqwest::blocking::Client::new();
+    let _ = client
+        .post("http://127.0.0.1:8790/config")
+        .json(cfg)
+        .timeout(std::time::Duration::from_secs(3))
+        .send();
+}
+
+#[tauri::command]
+fn check_ollama_models(host: Option<String>) -> OllamaStatus {
+    let base = host.unwrap_or_else(|| load_config().ollama_host);
+    let url = format!("{}/api/tags", base.trim_end_matches('/'));
+    let client = reqwest::blocking::Client::new();
+    let res = client
+        .get(&url)
+        .timeout(std::time::Duration::from_secs(4))
+        .send();
+
+    match res {
+        Ok(r) if r.status().is_success() => {
+            let models = r
+                .json::<serde_json::Value>()
+                .ok()
+                .and_then(|v| v.get("models")?.as_array().cloned())
+                .map(|arr| {
+                    arr.iter()
+                        .filter_map(|m| m.get("name").and_then(|n| n.as_str()).map(String::from))
+                        .collect()
+                })
+                .unwrap_or_default();
+            OllamaStatus {
+                online: true,
+                models,
+            }
+        }
+        _ => OllamaStatus {
+            online: false,
+            models: vec![],
+        },
+    }
+}
+
+#[tauri::command]
+fn check_vault_path(path: String) -> VaultPathStatus {
+    let exists = std::path::Path::new(&path).exists();
+    VaultPathStatus { exists, path }
 }
 
 #[tauri::command]
@@ -49,8 +130,6 @@ fn unlock_vault(
     let hash = hash_password(&password);
     let mut guard = state.lock().map_err(|e| e.to_string())?;
 
-    // First unlock sets the password hash for this session (dev mode).
-    // Production: verify against keyfile or OS keychain + VeraCrypt mount.
     match &guard.password_hash {
         None => guard.password_hash = Some(hash.clone()),
         Some(stored) if *stored != hash => return Ok(false),
@@ -73,10 +152,15 @@ fn lock_vault(state: State<'_, Mutex<VaultState>>) -> Result<(), String> {
 #[tauri::command]
 fn get_system_status(state: State<'_, Mutex<VaultState>>) -> Result<SystemStatus, String> {
     let guard = state.lock().map_err(|e| e.to_string())?;
-    let vault_path = guard.vault_path.clone();
+    let cfg = load_config();
+    let vault_path = if guard.vault_path.is_empty() {
+        cfg.vault_root.clone()
+    } else {
+        guard.vault_path.clone()
+    };
 
     let ollama_ok = reqwest::blocking::Client::new()
-        .get("http://127.0.0.1:11434/api/tags")
+        .get(format!("{}/api/tags", cfg.ollama_host.trim_end_matches('/')))
         .timeout(std::time::Duration::from_secs(2))
         .send()
         .map(|r| r.status().is_success())
@@ -93,7 +177,7 @@ fn get_system_status(state: State<'_, Mutex<VaultState>>) -> Result<SystemStatus
         ollama_ok,
         agent_ok,
         vault_path,
-        model: std::env::var("DEFAULT_MODEL").unwrap_or_else(|_| "dolphin-mistral:latest".into()),
+        model: cfg.default_model,
     })
 }
 
@@ -101,8 +185,14 @@ fn get_system_status(state: State<'_, Mutex<VaultState>>) -> Result<SystemStatus
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(Mutex::new(VaultState::default()))
         .invoke_handler(tauri::generate_handler![
+            is_onboarding_complete,
+            get_app_config,
+            save_app_config,
+            check_ollama_models,
+            check_vault_path,
             unlock_vault,
             lock_vault,
             get_system_status

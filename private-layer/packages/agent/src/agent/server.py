@@ -29,9 +29,33 @@ class ChatResponse(BaseModel):
     executed: list[str] = []
 
 
+class WizardConfig(BaseModel):
+    onboardingComplete: bool | None = None
+    vaultRoot: str | None = None
+    ollamaHost: str | None = None
+    defaultModel: str | None = None
+    requireActionApproval: bool | None = None
+
+
 @app.get("/health")
 def health():
     return {"ok": True, "service": "private-layer-agent"}
+
+
+@app.get("/config")
+def get_config():
+    return {
+        "vaultRoot": str(config.vault_root),
+        "ollamaHost": config.ollama_host,
+        "defaultModel": config.default_model,
+        "requireActionApproval": config.require_approval,
+    }
+
+
+@app.post("/config")
+def update_config(body: WizardConfig):
+    config.apply_wizard(body.model_dump(exclude_none=True))
+    return get_config()
 
 
 @app.post("/chat", response_model=ChatResponse)
