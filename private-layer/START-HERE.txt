@@ -1,0 +1,8 @@
+PRIVATE LAYER — ONE COMMAND ON YOUR WINDOWS PC
+
+  cd private-layer
+  powershell -ExecutionPolicy Bypass -File scripts\run-all-windows.ps1
+
+That runs setup, Ollama check, agent, and opens the app.
+
+Full guide: docs\INSTALL-WINDOWS.md

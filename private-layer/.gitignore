@@ -1,0 +1,15 @@
+node_modules/
+dist/
+target/
+.vault/
+*.hc
+.env
+.env.local
+__pycache__/
+*.pyc
+.venv/
+training-output/
+models/
+*.gguf
+*.safetensors
+.DS_Store
