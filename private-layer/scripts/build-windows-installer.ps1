@@ -17,8 +17,10 @@ function Require-Command($name, $hint) {
     }
 }
 
+. (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "Ensure-Pnpm.ps1")
+
 Require-Command node "Install Node.js 20+ from https://nodejs.org/"
-Require-Command pnpm "Run: corepack enable && corepack prepare pnpm@10.33.3 --activate"
+Ensure-Pnpm
 Require-Command cargo "Install Rust from https://rustup.rs/"
 Require-Command rustc "Install Rust from https://rustup.rs/"
 

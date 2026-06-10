@@ -23,10 +23,12 @@ function Need($name, $url) {
     Write-Host "  OK  $name" -ForegroundColor Green
 }
 
+. (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "Ensure-Pnpm.ps1")
+
 Write-Host "[1/8] Checking prerequisites..." -ForegroundColor Cyan
 Need node "https://nodejs.org/"
 Need python "https://www.python.org/"
-Need pnpm "Run: corepack enable && corepack prepare pnpm@10.33.3 --activate"
+Ensure-Pnpm
 # cargo only needed for tauri dev/build — warn if missing
 if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
     Write-Host "  WARN cargo not found — install Rust from https://rustup.rs/ for pnpm tauri dev" -ForegroundColor Yellow

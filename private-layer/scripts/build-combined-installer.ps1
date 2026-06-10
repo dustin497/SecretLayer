@@ -23,8 +23,10 @@ function Require-Command($name, $hint) {
     }
 }
 
+. (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "Ensure-Pnpm.ps1")
+
 Require-Command node "https://nodejs.org/"
-Require-Command pnpm "corepack enable && corepack prepare pnpm@10.33.3 --activate"
+Ensure-Pnpm
 Require-Command cargo "https://rustup.rs/"
 Require-Command python "https://www.python.org/ — needed on target PCs for agent"
 
