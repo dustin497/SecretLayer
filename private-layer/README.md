@@ -29,7 +29,27 @@ Windows Desktop
 
 **Recommended:** store the vault on a **VeraCrypt** volume (e.g. `V:\`). Mount it before opening PrivateLayer. See [docs/PRIVACY.md](docs/PRIVACY.md).
 
-## Quick start (Windows)
+## Install on Windows (installer + daily use)
+
+**Full guide:** [docs/INSTALL-WINDOWS.md](docs/INSTALL-WINDOWS.md)
+
+```powershell
+# Don't know your GPU?
+powershell -ExecutionPolicy Bypass -File scripts\detect-gpu.ps1
+
+# One-time stack setup
+powershell -ExecutionPolicy Bypass -File scripts\windows-setup.ps1
+
+# Build proper installer (.exe setup + .msi)
+powershell -ExecutionPolicy Bypass -File scripts\build-windows-installer.ps1
+
+# Desktop shortcut → starts Ollama + agent + app
+powershell -ExecutionPolicy Bypass -File scripts\create-desktop-shortcut.ps1
+```
+
+**Can you put cloud AI “in” the model?** No — but your **local** trained assistant is yours. See [docs/LOCAL-ASSISTANT-VS-CLOUD.md](docs/LOCAL-ASSISTANT-VS-CLOUD.md).
+
+## Quick start (developers)
 
 ### 1. Prerequisites
 

@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "pnpm --filter @private-layer/desktop dev",
     "build": "pnpm --filter @private-layer/desktop build",
-    "tauri": "pnpm --filter @private-layer/desktop tauri"
+    "tauri": "pnpm --filter @private-layer/desktop tauri",
+    "build:installer": "pnpm --filter @private-layer/desktop tauri build"
   },
   "engines": {
     "node": ">=20"

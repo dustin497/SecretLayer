@@ -7,6 +7,9 @@ Separate from SecretLayer. Sovereign Windows desktop vault at `private-layer/`.
 - Target OS: **Windows** (Tauri build). Linux cloud VM can lint frontend only.
 - VM update script: `cd private-layer && pnpm install`
 - Full desktop: `pnpm tauri dev` (requires Rust + Windows SDK on user machine)
+- Windows installer: `scripts/build-windows-installer.ps1` → NSIS `.exe` + MSI in `apps/desktop/src-tauri/target/release/bundle/`
+- GPU detect: `scripts/detect-gpu.ps1`
+- Daily launch: `scripts/start-private-layer.ps1` + `create-desktop-shortcut.ps1`
 - Agent sidecar: `cd packages/agent && pip install -e . && python -m agent serve` (port 8790)
 - Ollama expected at `127.0.0.1:11434`
 
