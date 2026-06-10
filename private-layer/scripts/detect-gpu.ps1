@@ -1,4 +1,5 @@
 # Detect GPU on Windows and recommend a local model size for PrivateLayer
+# ASCII-only for Windows PowerShell 5.1
 # Run: powershell -ExecutionPolicy Bypass -File scripts\detect-gpu.ps1
 
 Write-Host ""
@@ -29,13 +30,12 @@ foreach ($gpu in $gpus) {
     Write-Host "GPU: $($gpu.Name)" -ForegroundColor White
     if ($gpu.AdapterRAM -and $gpu.AdapterRAM -gt 0) {
         $vramGb = [math]::Round($gpu.AdapterRAM / 1GB, 1)
-        Write-Host "  Reported VRAM: ~${vramGb} GB (Windows estimate — may be wrong on some cards)"
+        Write-Host "  Reported VRAM: ~${vramGb} GB (Windows estimate - may be wrong on some cards)"
     }
     Write-Host "  Driver: $($gpu.DriverVersion)"
     Write-Host ""
 }
 
-# NVIDIA CUDA check
 $nvidia = Get-Command nvidia-smi -ErrorAction SilentlyContinue
 if ($nvidia) {
     Write-Host "NVIDIA driver (nvidia-smi):" -ForegroundColor Green
@@ -56,13 +56,13 @@ if ($name -match "NVIDIA") {
 } elseif ($name -match "AMD|Radeon") {
     Write-Host "Recommendation (AMD):" -ForegroundColor Green
     Write-Host "  ollama pull qwen2.5:7b (ROCm if configured) or qwen2.5:3b for CPU fallback"
-    Write-Host "  Training: AMD on Windows is harder — consider CPU training or smaller models"
+    Write-Host "  Training: AMD on Windows is harder - consider CPU training or smaller models"
 } elseif ($name -match "Intel") {
     Write-Host "Recommendation (Intel iGPU):" -ForegroundColor Green
     Write-Host "  ollama pull qwen2.5:1.5b or qwen2.5:3b"
 } else {
     Write-Host "Recommendation:" -ForegroundColor Green
-    Write-Host "  ollama pull qwen2.5:7b — if slow, try qwen2.5:3b"
+    Write-Host "  ollama pull qwen2.5:7b - if slow, try qwen2.5:3b"
 }
 
 Write-Host ""

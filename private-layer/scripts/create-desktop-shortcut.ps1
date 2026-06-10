@@ -30,7 +30,7 @@ $Sc.WorkingDirectory = $Root
 if (Test-Path $InstalledExe) {
     $Sc.IconLocation = "$InstalledExe,0"
 }
-$Sc.Description = "PrivateLayer — Dark Side vault (Ollama + agent + app)"
+$Sc.Description = "PrivateLayer - Dark Side vault (Ollama + agent + app)"
 $Sc.Save()
 
 Write-Host "Shortcut: $ShortcutPath" -ForegroundColor Green

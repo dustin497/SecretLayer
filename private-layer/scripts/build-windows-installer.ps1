@@ -25,12 +25,12 @@ Require-Command cargo "Install Rust from https://rustup.rs/"
 Require-Command rustc "Install Rust from https://rustup.rs/"
 
 Write-Host "Installing dependencies..." -ForegroundColor Gray
-corepack enable | Out-Null
-corepack prepare pnpm@10.33.3 --activate | Out-Null
-pnpm install
+Invoke-Pnpm install
+if ($LASTEXITCODE -ne 0) { throw "pnpm install failed" }
 
 Write-Host "Building production installer (NSIS + MSI)..." -ForegroundColor Gray
-pnpm tauri build
+Invoke-Pnpm tauri build
+if ($LASTEXITCODE -ne 0) { throw "pnpm tauri build failed" }
 
 $nsis = Get-ChildItem -Path "apps\desktop\src-tauri\target\release\bundle\nsis" -Filter "*.exe" -ErrorAction SilentlyContinue
 $msi  = Get-ChildItem -Path "apps\desktop\src-tauri\target\release\bundle\msi"  -Filter "*.msi" -ErrorAction SilentlyContinue
@@ -38,7 +38,7 @@ $msi  = Get-ChildItem -Path "apps\desktop\src-tauri\target\release\bundle\msi"  
 Write-Host ""
 Write-Host "=== Build complete ===" -ForegroundColor Green
 if ($nsis) {
-    Write-Host "NSIS installer (recommended — double-click to install):"
+    Write-Host "NSIS installer (recommended - double-click to install):"
     $nsis | ForEach-Object { Write-Host "  $($_.FullName)" -ForegroundColor White }
 }
 if ($msi) {
