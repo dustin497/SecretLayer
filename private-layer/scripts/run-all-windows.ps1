@@ -98,7 +98,11 @@ Write-Host ""
 Write-Host "[2/8] GPU detect..." -ForegroundColor Cyan
 $gpuScript = Join-Path $Root "scripts\detect-gpu.ps1"
 if (Test-Path $gpuScript) {
-    & powershell -ExecutionPolicy Bypass -File $gpuScript
+    try {
+        & powershell -ExecutionPolicy Bypass -File $gpuScript
+    } catch {
+        Write-Host "  GPU detect skipped (non-fatal)" -ForegroundColor Yellow
+    }
 }
 
 Write-Host ""
