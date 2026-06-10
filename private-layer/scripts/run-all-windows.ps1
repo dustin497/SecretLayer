@@ -1,5 +1,5 @@
 # PrivateLayer — ONE script to run everything on YOUR Windows PC
-# Right-click PowerShell → Run as your user (admin not required)
+# Works on Windows PowerShell 5.1 and PowerShell 7+
 #
 #   cd path\to\SecretLayer\private-layer
 #   powershell -ExecutionPolicy Bypass -File scripts\run-all-windows.ps1
@@ -10,33 +10,55 @@ Set-Location $Root
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  PrivateLayer — full setup + launch" -ForegroundColor Cyan
+Write-Host "  PrivateLayer - full setup + launch" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-function Need($name, $url) {
+function Need($name, $hint) {
     if (-not (Get-Command $name -ErrorAction SilentlyContinue)) {
         Write-Host "MISSING: $name" -ForegroundColor Red
-        Write-Host "  Install from: $url" -ForegroundColor Yellow
+        Write-Host "  $hint" -ForegroundColor Yellow
         exit 1
     }
     Write-Host "  OK  $name" -ForegroundColor Green
 }
 
+function Ensure-Pnpm {
+    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
+        Write-Host "  OK  pnpm" -ForegroundColor Green
+        return
+    }
+    if (Get-Command corepack -ErrorAction SilentlyContinue) {
+        Write-Host "  Enabling pnpm via corepack..." -ForegroundColor Gray
+        corepack enable | Out-Null
+        corepack prepare pnpm@10.33.3 --activate | Out-Null
+    }
+    if (Get-Command pnpm -ErrorAction SilentlyContinue) {
+        Write-Host "  OK  pnpm" -ForegroundColor Green
+        return
+    }
+    Write-Host "MISSING: pnpm" -ForegroundColor Red
+    Write-Host "  Run: corepack enable" -ForegroundColor Yellow
+    Write-Host "  Then: corepack prepare pnpm@10.33.3 --activate" -ForegroundColor Yellow
+    exit 1
+}
+
 Write-Host "[1/8] Checking prerequisites..." -ForegroundColor Cyan
-Need node "https://nodejs.org/"
-Need python "https://www.python.org/"
-Need pnpm "Run: corepack enable && corepack prepare pnpm@10.33.3 --activate"
-# cargo only needed for tauri dev/build — warn if missing
+Need node "Install Node.js 20+ from https://nodejs.org/"
+Need python "Install Python 3.11+ from https://www.python.org/ (check Add to PATH)"
+Ensure-Pnpm
 if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
-    Write-Host "  WARN cargo not found — install Rust from https://rustup.rs/ for pnpm tauri dev" -ForegroundColor Yellow
+    Write-Host "  WARN cargo not found - install Rust from https://rustup.rs/ for pnpm tauri dev" -ForegroundColor Yellow
 } else {
     Write-Host "  OK  cargo" -ForegroundColor Green
 }
 
 Write-Host ""
 Write-Host "[2/8] GPU detect..." -ForegroundColor Cyan
-& powershell -ExecutionPolicy Bypass -File (Join-Path $Root "scripts\detect-gpu.ps1")
+$gpuScript = Join-Path $Root "scripts\detect-gpu.ps1"
+if (Test-Path $gpuScript) {
+    & powershell -ExecutionPolicy Bypass -File $gpuScript
+}
 
 Write-Host ""
 Write-Host "[3/8] Node + Python setup..." -ForegroundColor Cyan
@@ -64,7 +86,7 @@ if (Get-Command ollama -ErrorAction SilentlyContinue) {
         Start-Sleep -Seconds 3
     }
 } else {
-    Write-Host "  Ollama NOT installed — opening download page" -ForegroundColor Yellow
+    Write-Host "  Ollama NOT installed - opening download page" -ForegroundColor Yellow
     Start-Process "https://ollama.com/download/windows"
     Write-Host "  Install Ollama, then re-run this script." -ForegroundColor Yellow
     Read-Host "Press Enter after installing Ollama (or to continue without model)"
@@ -76,10 +98,11 @@ $agentPy = Join-Path $agentDir ".venv\Scripts\python.exe"
 $agentUp = $false
 try {
     $r = Invoke-WebRequest "http://127.0.0.1:8790/health" -UseBasicParsing -TimeoutSec 2
-    $agentUp = $r.StatusCode -eq 200
+    $agentUp = ($r.StatusCode -eq 200)
 } catch { }
 
 if (-not $agentUp) {
+    $env:PYTHONPATH = Join-Path $agentDir "src"
     Start-Process -FilePath $agentPy -ArgumentList "-m","agent","serve" -WorkingDirectory $agentDir -WindowStyle Hidden
     Start-Sleep -Seconds 3
     Write-Host "  Agent running on http://127.0.0.1:8790" -ForegroundColor Green
