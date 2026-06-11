@@ -235,8 +235,9 @@
 }
 
 .form-field .blank.prefilled {
-  border-bottom-style: dotted;
-  color: #333;
+  border-bottom-style: solid;
+  color: #111;
+  font-weight: 500;
 }
 
 .form-check-row {

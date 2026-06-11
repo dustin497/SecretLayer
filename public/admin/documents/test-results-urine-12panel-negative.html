@@ -27,7 +27,7 @@
       <div class="form-doc-meta">
         <div><strong>Report:</strong> FTS-UR12-001</div>
         <div><strong>Revision:</strong> 2026.1</div>
-        <div class="doc-id">Report ID: FTS-RPT-________</div>
+        <div class="doc-id" data-field="reportId">Report ID: FTS-RPT-________</div>
       </div>
     </header>
 
@@ -54,27 +54,45 @@
         <div class="results-meta three-col">
           <div class="form-field">
             <label>Donor name</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="donorName"></div>
           </div>
           <div class="form-field">
             <label>Donor ID / last 4 SSN</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="donorId"></div>
+          </div>
+          <div class="form-field">
+            <label>Date of birth</label>
+            <div class="blank" data-field="dob"></div>
           </div>
           <div class="form-field">
             <label>Specimen ID / cup ID</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="specimenId"></div>
+          </div>
+          <div class="form-field">
+            <label>Lab accession #</label>
+            <div class="blank" data-field="labAccessionNumber"></div>
+          </div>
+          <div class="form-field">
+            <label>Phone</label>
+            <div class="blank" data-field="phone"></div>
           </div>
           <div class="form-field">
             <label>Collection date</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="collectionDate"></div>
           </div>
           <div class="form-field print-hide">
             <label>Collection time</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="collectionTime"></div>
           </div>
           <div class="form-field">
             <label>Report date</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="reportDate"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field" style="flex: 2;">
+            <label>Donor address</label>
+            <div class="blank" data-field="fullAddress"></div>
           </div>
         </div>
         <div class="form-row">
@@ -84,11 +102,11 @@
           </div>
           <div class="form-field">
             <label>Collector / conducted by</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="collector"></div>
           </div>
           <div class="form-field">
             <label>Reason for test</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="reasonForTest"></div>
           </div>
         </div>
         <div class="form-row">
@@ -166,7 +184,7 @@
         <div class="form-row">
           <div class="form-field">
             <label>Testing laboratory (if sent out)</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="laboratory"></div>
           </div>
           <div class="form-field print-hide">
             <label>MRO review date</label>
@@ -206,6 +224,6 @@
 
   <script src="../js/auth-config.js"></script>
   <script src="../js/auth.js"></script>
-  <script>FTSAdmin.requireAuth("../index.html");</script>
+  <script src="../js/form-prefill.js"></script>
 </body>
 </html>

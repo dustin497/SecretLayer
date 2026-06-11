@@ -20,44 +20,92 @@
       </div>
 
       <p class="admin-lead">
-        Register each test <strong>before</strong> printing reports. IDs generated here match the public
-        <a href="../verify.html" target="_blank" rel="noopener">verify page</a> and phone back-checks.
+        Enter donor information once — the system assigns <strong>Report ID</strong>, <strong>Specimen ID</strong>, and <strong>Lab Accession #</strong>,
+        then opens a <strong>pre-filled negative results</strong> form ready to print.
       </p>
 
       <form id="record-form" class="record-form">
-        <h3>New collection record</h3>
+        <h3>Donor &amp; test information</h3>
         <div class="form-grid">
           <div>
-            <label for="firstName">First name</label>
+            <label for="firstName">First name *</label>
             <input type="text" id="firstName" required>
           </div>
           <div>
-            <label for="lastName">Last name</label>
+            <label for="middleName">Middle name</label>
+            <input type="text" id="middleName">
+          </div>
+          <div>
+            <label for="lastName">Last name *</label>
             <input type="text" id="lastName" required>
           </div>
           <div>
-            <label for="dob">Date of birth</label>
+            <label for="dob">Date of birth *</label>
             <input type="text" id="dob" placeholder="MM/DD/YYYY" required>
           </div>
           <div>
-            <label for="collectionDate">Collection date</label>
+            <label for="donorId">Donor ID / last 4 SSN</label>
+            <input type="text" id="donorId">
+          </div>
+          <div>
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone">
+          </div>
+          <div class="span-2">
+            <label for="address">Street address</label>
+            <input type="text" id="address" placeholder="123 Main St">
+          </div>
+          <div>
+            <label for="city">City</label>
+            <input type="text" id="city">
+          </div>
+          <div>
+            <label for="state">State</label>
+            <input type="text" id="state" value="AL" maxlength="2">
+          </div>
+          <div>
+            <label for="zip">ZIP</label>
+            <input type="text" id="zip">
+          </div>
+          <div>
+            <label for="collectionDate">Collection date *</label>
             <input type="text" id="collectionDate" placeholder="MM/DD/YYYY" required>
           </div>
           <div>
-            <label for="testType">Test type</label>
+            <label for="collectionTime">Collection time</label>
+            <input type="text" id="collectionTime" placeholder="e.g. 10:30 AM">
+          </div>
+          <div>
+            <label for="reportDate">Report date</label>
+            <input type="text" id="reportDate" placeholder="MM/DD/YYYY">
+          </div>
+          <div>
+            <label for="testType">Test type *</label>
             <select id="testType">
-              <option value="nail-14">14-Panel Nail Keratin</option>
-              <option value="urine-12">12-Panel Urine (Non-DOT)</option>
+              <option value="urine-12">12-Panel Urine — Negative Screen</option>
+              <option value="nail-14">14-Panel Nail Keratin — Negative Results</option>
               <option value="custody-only">Chain of Custody only</option>
             </select>
           </div>
           <div>
-            <label for="result">Internal result (not shown online)</label>
+            <label for="result">Result (pre-filled on form)</label>
             <select id="result">
+              <option value="negative" selected>Negative</option>
               <option value="pending">Pending</option>
-              <option value="negative">Negative</option>
               <option value="positive">Positive</option>
             </select>
+          </div>
+          <div>
+            <label for="laboratory">Testing laboratory</label>
+            <input type="text" id="laboratory" value="COLA-Accredited Reference Laboratory">
+          </div>
+          <div>
+            <label for="collector">Collector / conducted by</label>
+            <input type="text" id="collector" placeholder="Staff name">
+          </div>
+          <div class="span-2">
+            <label for="reasonForTest">Reason for test</label>
+            <input type="text" id="reasonForTest" placeholder="Employment, court, personal, etc.">
           </div>
           <div class="span-2">
             <label for="authorizedParty">Authorized party (optional)</label>
@@ -68,12 +116,12 @@
             <input type="text" id="notes" placeholder="Callback number, release form filed, etc.">
           </div>
         </div>
-        <button type="submit" class="btn-primary">Generate Report &amp; Specimen IDs</button>
+        <button type="submit" class="btn-primary">Save &amp; Generate Lab Numbers</button>
         <p id="form-error" class="error"></p>
       </form>
 
       <div id="created-banner" class="created-banner" hidden>
-        <strong>Record saved — use these IDs on printed forms:</strong>
+        <strong>Saved — lab numbers assigned:</strong>
         <div class="id-pair">
           <span>Report ID: <code id="new-report-id"></code></span>
           <button type="button" class="copy-btn" data-copy="new-report-id">Copy</button>
@@ -81,6 +129,14 @@
         <div class="id-pair">
           <span>Specimen ID: <code id="new-specimen-id"></code></span>
           <button type="button" class="copy-btn" data-copy="new-specimen-id">Copy</button>
+        </div>
+        <div class="id-pair">
+          <span>Lab Accession #: <code id="new-lab-id"></code></span>
+          <button type="button" class="copy-btn" data-copy="new-lab-id">Copy</button>
+        </div>
+        <div class="print-actions">
+          <a id="print-negative-btn" class="btn-primary print-link-btn" href="#" target="_blank" rel="noopener">Print Pre-Filled Negative Report →</a>
+          <a id="print-custody-btn" class="btn-secondary print-link-btn" href="#" target="_blank" rel="noopener" hidden>Print Chain of Custody →</a>
         </div>
       </div>
 
@@ -94,7 +150,8 @@
               <th>Donor</th>
               <th>Collected</th>
               <th>Test</th>
-              <th>Result</th>
+              <th>Printed</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="record-rows"></tbody>

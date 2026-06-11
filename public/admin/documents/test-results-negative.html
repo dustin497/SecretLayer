@@ -27,7 +27,7 @@
       <div class="form-doc-meta">
         <div><strong>Report:</strong> FTS-NKR-001</div>
         <div><strong>Revision:</strong> 2026.1</div>
-        <div class="doc-id">Report ID: FTS-RPT-________</div>
+        <div class="doc-id" data-field="reportId">Report ID: FTS-RPT-________</div>
       </div>
     </header>
 
@@ -53,27 +53,45 @@
         <div class="results-meta three-col">
           <div class="form-field">
             <label>Donor name</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="donorName"></div>
+          </div>
+          <div class="form-field">
+            <label>Date of birth</label>
+            <div class="blank" data-field="dob"></div>
+          </div>
+          <div class="form-field">
+            <label>Phone</label>
+            <div class="blank" data-field="phone"></div>
           </div>
           <div class="form-field">
             <label>Specimen ID</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="specimenId"></div>
+          </div>
+          <div class="form-field">
+            <label>Lab accession #</label>
+            <div class="blank" data-field="labAccessionNumber"></div>
           </div>
           <div class="form-field">
             <label>Collection date</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="collectionDate"></div>
           </div>
           <div class="form-field">
             <label>Report date</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="reportDate"></div>
           </div>
           <div class="form-field print-hide">
             <label>Results released date</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="reportDate"></div>
           </div>
           <div class="form-field print-hide">
             <label>Conducted by (collector)</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="collector"></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field" style="flex: 2;">
+            <label>Donor address</label>
+            <div class="blank" data-field="fullAddress"></div>
           </div>
         </div>
         <div class="form-row">
@@ -83,7 +101,7 @@
           </div>
           <div class="form-field">
             <label>Testing laboratory</label>
-            <div class="blank"></div>
+            <div class="blank" data-field="laboratory"></div>
           </div>
         </div>
         <div class="form-row print-hide">
@@ -171,6 +189,6 @@
 
   <script src="../js/auth-config.js"></script>
   <script src="../js/auth.js"></script>
-  <script>FTSAdmin.requireAuth("../index.html");</script>
+  <script src="../js/form-prefill.js"></script>
 </body>
 </html>
