@@ -1,13 +1,15 @@
-PRIVATE LAYER — ONE COMMAND ON YOUR WINDOWS PC
+PRIVATE LAYER - ONE COMMAND ON YOUR WINDOWS PC
+
+  DOUBLE-CLICK:  FINISH.bat
+
+  (in folder C:\dev\secretlair-\private-layer)
+
+Or in PowerShell:
 
   cd C:\dev\secretlair-\private-layer
   git pull origin cursor/private-layer-scaffold-058f
-  powershell -ExecutionPolicy Bypass -File scripts\fix-node-deps.ps1
-  powershell -ExecutionPolicy Bypass -File scripts\tauri-dev-windows.ps1
+  .\FINISH.bat
 
-Or full setup + launch:
-
-  powershell -ExecutionPolicy Bypass -File scripts\run-all-windows.ps1
+Requires Node 22 LTS (NOT Node 24): https://nodejs.org/
 
 Full guide: docs\INSTALL-WINDOWS.md
-Local agent handoff: LOCAL_AGENT_HANDOFF.md
