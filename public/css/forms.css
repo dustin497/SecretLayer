@@ -465,27 +465,369 @@
   color: #264653;
 }
 
+@page {
+  size: letter portrait;
+  margin: 0.15in 0.25in;
+}
+
 @media print {
   .form-page-body {
     background: #fff;
     padding: 0;
   }
 
-  .form-toolbar {
+  .form-toolbar,
+  .print-hide {
     display: none !important;
   }
 
   .form-sheet {
     box-shadow: none;
     max-width: none;
-    padding: 0.35in 0.4in;
+    width: 100%;
+    padding: 0;
+    font-size: 7.5pt;
+    line-height: 1.22;
+  }
+
+  .form-header {
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.3rem;
+    gap: 0.5rem;
+  }
+
+  .form-header-brand img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .form-header-brand h1 {
+    font-size: 10.5pt;
+  }
+
+  .form-header-brand p {
+    font-size: 6.5pt;
+    margin-top: 0.1rem;
+  }
+
+  .form-doc-meta {
+    font-size: 6.5pt;
+    min-width: 120px;
+  }
+
+  .form-doc-meta .doc-id {
+    font-size: 7pt;
+  }
+
+  .form-title {
+    margin-bottom: 0.3rem;
+  }
+
+  .form-title h2 {
+    font-size: 9.5pt;
+  }
+
+  .form-title p {
+    font-size: 6.5pt;
+  }
+
+  .form-badge-row {
+    margin-top: 0.15rem;
+    gap: 0.2rem;
+  }
+
+  .form-badge {
+    font-size: 5.5pt;
+    padding: 0.08rem 0.3rem;
+  }
+
+  .form-notice {
+    padding: 0.2rem 0.35rem;
+    margin-bottom: 0.3rem;
+    font-size: 6.5pt;
+    border-left-width: 2px;
   }
 
   .form-section {
+    margin-bottom: 0.28rem;
     page-break-inside: avoid;
   }
 
+  .form-section-title {
+    padding: 0.12rem 0.35rem;
+    font-size: 6.5pt;
+  }
+
+  .form-section-body {
+    padding: 0.25rem 0.35rem;
+  }
+
+  .form-section-body p.lead {
+    font-size: 6.5pt;
+    margin-bottom: 0.25rem;
+  }
+
+  .form-row {
+    margin-bottom: 0.22rem;
+    gap: 0.4rem;
+  }
+
+  .form-field {
+    min-width: 100px;
+  }
+
+  .form-field label {
+    font-size: 5.5pt;
+    margin-bottom: 0.04rem;
+  }
+
+  .form-field .blank {
+    min-height: 0.85rem;
+    font-size: 7.5pt;
+  }
+
+  .form-check-row {
+    gap: 0.6rem;
+    margin-top: 0.15rem;
+  }
+
+  .form-check {
+    font-size: 7pt;
+  }
+
+  .form-check .box {
+    width: 10px;
+    height: 10px;
+  }
+
+  .shipping-track {
+    padding: 0.15rem 0;
+    gap: 0.4rem;
+  }
+
+  .shipping-arrow {
+    font-size: 10pt;
+  }
+
+  .lab-destination {
+    padding: 0.25rem 0.35rem;
+    font-size: 6.5pt;
+  }
+
+  .turnaround-box {
+    padding: 0.2rem 0.35rem;
+    font-size: 6.5pt;
+    margin-top: 0.3rem !important;
+  }
+
+  .turnaround-box strong {
+    font-size: 7pt;
+  }
+
+  .form-sig-row {
+    gap: 0.5rem;
+    margin-top: 0.28rem;
+  }
+
+  .sig-line {
+    min-height: 0.75rem;
+    margin-bottom: 0.08rem;
+  }
+
+  .sig-label {
+    font-size: 5.5pt;
+    line-height: 1.15;
+  }
+
+  .form-sig-row.compact-4 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0.35rem;
+  }
+
+  .form-footer {
+    margin-top: 0.28rem;
+    padding-top: 0.2rem;
+    font-size: 5.5pt;
+    line-height: 1.2;
+  }
+
+  .form-disclaimer {
+    font-size: 5.5pt;
+    margin-top: 0.2rem;
+    line-height: 1.15;
+  }
+
+  .results-banner {
+    padding: 0.25rem 0.4rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .results-banner h2 {
+    font-size: 10pt;
+  }
+
+  .results-banner .result-code {
+    font-size: 6.5pt;
+    margin-top: 0.05rem;
+  }
+
+  .results-banner p {
+    display: none;
+  }
+
+  .results-meta,
+  .results-meta.three-col {
+    gap: 0.3rem;
+    margin-bottom: 0.28rem;
+  }
+
   .results-table {
-    font-size: 8pt;
+    font-size: 6.5pt;
+  }
+
+  .results-table th,
+  .results-table td {
+    padding: 0.1rem 0.22rem;
+  }
+
+  .results-table th {
+    font-size: 5.5pt;
+  }
+
+  .results-table.compact-table td:nth-child(3),
+  .results-table.compact-table td:nth-child(4) {
+    white-space: nowrap;
+  }
+
+  .interpretation-box {
+    padding: 0.2rem 0.3rem;
+    font-size: 6.5pt;
+    margin: 0.25rem 0.3rem !important;
+  }
+
+  .cert-stamp {
+    padding: 0.2rem 0.3rem;
+    font-size: 6pt;
+    margin-top: 0.28rem;
+    border-width: 1px;
+  }
+
+  /* One-page forms — fit on a single letter sheet */
+  .form-sheet.one-page {
+    font-size: 7pt;
+    line-height: 1.18;
+  }
+
+  .one-page .form-header-brand img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .one-page .form-header-brand h1 {
+    font-size: 9.5pt;
+  }
+
+  .one-page .form-header-brand .print-address {
+    font-size: 6pt;
+  }
+
+  .one-page .form-badge-row {
+    display: none;
+  }
+
+  .one-page .form-title {
+    margin-bottom: 0.2rem;
+  }
+
+  .one-page .form-title h2 {
+    font-size: 9pt;
+  }
+
+  .one-page .form-title p {
+    font-size: 6pt;
+    margin-top: 0;
+  }
+
+  .one-page .form-section {
+    margin-bottom: 0.2rem;
+  }
+
+  .one-page .form-section-body {
+    padding: 0.18rem 0.3rem;
+  }
+
+  .one-page .form-field .blank {
+    min-height: 0.7rem;
+    font-size: 7pt;
+  }
+
+  .one-page .results-meta.three-col {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .one-page .results-table {
+    font-size: 6pt;
+  }
+
+  .one-page .results-table th,
+  .one-page .results-table td {
+    padding: 0.06rem 0.18rem;
+    line-height: 1.15;
+  }
+
+  .one-page .results-table th {
+    font-size: 5pt;
+  }
+
+  .one-page .results-table.compact-table .col-result,
+  .one-page .results-table.compact-table .col-status {
+    width: 14%;
+  }
+
+  .one-page .results-table.compact-table td:nth-child(3)::after,
+  .one-page .results-table.compact-table td:nth-child(4)::after {
+    content: none;
+  }
+
+  .one-page .results-table.compact-table td:nth-child(3) {
+    font-size: 5.5pt;
+  }
+
+  .one-page .shipping-track {
+    flex-wrap: nowrap;
+  }
+
+  .one-page .shipping-track > div:first-child {
+    font-size: 6pt;
+    line-height: 1.15;
+  }
+
+  .one-page .turnaround-box {
+    padding: 0.15rem 0.25rem;
+    font-size: 6pt;
+  }
+
+  .one-page .form-sig-row.compact-4 .sig-line {
+    min-height: 0.65rem;
+  }
+
+  .one-page .interpretation-box {
+    padding: 0.15rem 0.25rem;
+    font-size: 6pt;
+    margin: 0.18rem 0.25rem !important;
+  }
+
+  .one-page .cert-stamp {
+    font-size: 5.5pt;
+    padding: 0.15rem 0.25rem;
+    margin-top: 0.2rem;
+  }
+
+  .one-page .form-footer {
+    margin-top: 0.18rem;
+    padding-top: 0.15rem;
+    font-size: 5pt;
   }
 }

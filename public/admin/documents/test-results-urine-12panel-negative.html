@@ -15,14 +15,13 @@
     <a href="../dashboard.html" class="btn-back">← Back to Documents</a>
   </div>
 
-  <div class="form-sheet">
+  <div class="form-sheet one-page">
     <header class="form-header">
       <div class="form-header-brand">
         <img src="../../images/logo.png" alt="Family Testing Services">
         <div>
           <h1>Family Testing Services</h1>
-          <p>1801 2nd Avenue North, Suite 204 · Bessemer, AL 35020<br>
-          Phone: (205) 579-0707 · License: AL-DT-2014-0847</p>
+          <p class="print-address">1801 2nd Ave N, Ste 204, Bessemer, AL 35020 · (205) 579-0707 · AL-DT-2014-0847</p>
         </div>
       </div>
       <div class="form-doc-meta">
@@ -69,7 +68,7 @@
             <label>Collection date</label>
             <div class="blank"></div>
           </div>
-          <div class="form-field">
+          <div class="form-field print-hide">
             <label>Collection time</label>
             <div class="blank"></div>
           </div>
@@ -106,7 +105,7 @@
             <div class="blank"></div>
           </div>
         </div>
-        <div class="form-check-row">
+        <div class="form-check-row print-hide">
           <label class="form-check"><span class="box"></span> Instant screen (on-site)</label>
           <label class="form-check"><span class="box"></span> Laboratory confirmation</label>
           <label class="form-check"><span class="box"></span> Split specimen collected</label>
@@ -117,7 +116,7 @@
     <section class="form-section">
       <div class="form-section-title">12-Panel Urine Drug Screen Results</div>
       <div class="form-section-body" style="padding: 0;">
-        <table class="results-table">
+        <table class="results-table compact-table">
           <thead>
             <tr>
               <th class="col-drug">Drug class / analyte</th>
@@ -127,22 +126,22 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td>Amphetamines (AMP / methamphetamine)</td><td>1,000</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Barbiturates</td><td>300</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Benzodiazepines</td><td>300</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Buprenorphine</td><td>10</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Cocaine metabolite (benzoylecgonine)</td><td>300</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Marijuana metabolite (THC-COOH)</td><td>50</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>MDMA (ecstasy)</td><td>500</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Methadone</td><td>300</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Opiates (codeine / morphine)</td><td>2,000</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Oxycodone</td><td>100</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Phencyclidine (PCP)</td><td>25</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
-            <tr><td>Propoxyphene</td><td>300</td><td class="neg">Below cutoff</td><td class="neg">Negative</td></tr>
+            <tr><td>Amphetamines (AMP/METH)</td><td>1,000</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Barbiturates</td><td>300</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Benzodiazepines</td><td>300</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Buprenorphine</td><td>10</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Cocaine (BE)</td><td>300</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Marijuana (THC-COOH)</td><td>50</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>MDMA</td><td>500</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Methadone</td><td>300</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Opiates (codeine/morphine)</td><td>2,000</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Oxycodone</td><td>100</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>PCP</td><td>25</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
+            <tr><td>Propoxyphene</td><td>300</td><td class="neg">&lt; cutoff</td><td class="neg">Neg</td></tr>
           </tbody>
         </table>
         <div class="interpretation-box" style="margin: 0.55rem;">
-          <strong>Overall specimen interpretation:</strong> <span class="neg">NEGATIVE</span> — No drugs were detected at or above the screening cutoff concentrations listed above for this urine specimen.
+          <strong>Overall:</strong> <span class="neg">NEGATIVE</span> — No drugs detected at or above screening cutoffs for this urine specimen.
         </div>
       </div>
     </section>
@@ -155,11 +154,11 @@
             <label>Specimen temperature at collection (°F)</label>
             <div class="blank"></div>
           </div>
-          <div class="form-field">
+          <div class="form-field print-hide">
             <label>Creatinine (if tested)</label>
             <div class="blank"></div>
           </div>
-          <div class="form-field">
+          <div class="form-field print-hide">
             <label>Specific gravity (if tested)</label>
             <div class="blank"></div>
           </div>
@@ -169,43 +168,38 @@
             <label>Testing laboratory (if sent out)</label>
             <div class="blank"></div>
           </div>
-          <div class="form-field">
+          <div class="form-field print-hide">
             <label>MRO review date</label>
             <div class="blank"></div>
           </div>
         </div>
-        <div class="form-sig-row">
+        <div class="form-sig-row compact-4">
           <div>
             <div class="sig-line"></div>
-            <div class="sig-label">Collector signature — Family Testing Services</div>
+            <div class="sig-label">Collector — FTS</div>
           </div>
           <div>
             <div class="sig-line"></div>
-            <div class="sig-label">Medical Review Officer (MRO) signature</div>
-          </div>
-        </div>
-        <div class="form-sig-row">
-          <div>
-            <div class="sig-line"></div>
-            <div class="sig-label">Date released to donor / agency</div>
+            <div class="sig-label">MRO signature</div>
           </div>
           <div>
             <div class="sig-line"></div>
-            <div class="sig-label">Authorized by (site director)</div>
+            <div class="sig-label">Date released</div>
+          </div>
+          <div>
+            <div class="sig-line"></div>
+            <div class="sig-label">Site director</div>
           </div>
         </div>
         <div class="cert-stamp">
-          <strong>Non-DOT 12-panel urine drug screen</strong><br>
-          Not intended for DOT, FMCSA, FAA, FRA, FTA, PHMSA, or USCG regulated testing unless separately ordered.<br>
-          Confidential — release only to authorized parties.
+          <strong>Non-DOT 12-panel urine</strong> — Not for DOT/FMCSA regulated testing unless separately ordered · Confidential
         </div>
-        <p class="form-disclaimer">A negative result means no substances were detected at or above the cutoffs listed. Cutoffs shown are standard industry screening levels for non-DOT urine panels and may vary by device or laboratory. Prescription medications and adulteration concerns should be reviewed by an MRO when applicable.</p>
+        <p class="form-disclaimer">Negative = below cutoffs listed. Cutoffs are standard non-DOT screening levels; may vary by device/lab. MRO review when applicable.</p>
       </div>
     </section>
 
     <footer class="form-footer">
-      Family Testing Services · 12-panel urine drug screen results · Form FTS-UR12-001 Rev. 2026.1<br>
-      Questions: (205) 579-0707 · Complete blank fields before printing for distribution.
+      FTS-UR12-001 Rev. 2026.1 · Complete blank fields before printing · (205) 579-0707
     </footer>
   </div>
 
