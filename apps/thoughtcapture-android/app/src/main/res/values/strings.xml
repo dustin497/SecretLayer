@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ThoughtCapture</string>
+    <string name="recording_notification_title">Listening…</string>
+    <string name="recording_notification_text">Tap your earbuds again or say \"done\" to finish</string>
+    <string name="processing_notification_title">Processing thought…</string>
+    <string name="idle_notification_title">ThoughtCapture ready</string>
+    <string name="idle_notification_text">Double-tap earbuds to capture a thought</string>
+    <string name="notification_channel_recording">Recording</string>
+    <string name="notification_channel_status">Status</string>
+    <string name="action_stop_recording">Stop</string>
+    <string name="action_start_recording">Record</string>
+    <string name="permission_mic_rationale">Microphone access lets ThoughtCapture hear your voice notes while driving.</string>
+    <string name="permission_notification_rationale">Notifications show recording status and let you stop captures from the lock screen.</string>
+    <string name="empty_state_title">No thoughts yet</string>
+    <string name="empty_state_body">Double-tap your Galaxy Buds or tap the mic button to capture your first thought.</string>
+    <string name="home_subtitle">Voice-first thought assistant</string>
+    <string name="gesture_hint">Galaxy Buds: set double-tap to Play/Pause in Galaxy Wearable</string>
+</resources>
