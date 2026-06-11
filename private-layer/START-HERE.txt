@@ -1,0 +1,15 @@
+PRIVATE LAYER - ONE COMMAND ON YOUR WINDOWS PC
+
+  DOUBLE-CLICK:  FINISH.bat
+
+  (in folder C:\dev\secretlair-\private-layer)
+
+Or in PowerShell:
+
+  cd C:\dev\secretlair-\private-layer
+  git pull origin cursor/private-layer-scaffold-058f
+  .\FINISH.bat
+
+Requires Node 22 LTS (NOT Node 24): https://nodejs.org/
+
+Full guide: docs\INSTALL-WINDOWS.md

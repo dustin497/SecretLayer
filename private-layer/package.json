@@ -1,0 +1,21 @@
+{
+  "name": "private-layer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PrivateLayer — your sovereign desktop vault. Local LLM, training pipeline, action-taking assistant.",
+  "packageManager": "pnpm@10.33.3",
+  "scripts": {
+    "dev": "pnpm --filter @private-layer/desktop dev",
+    "build": "pnpm --filter @private-layer/desktop build",
+    "tauri": "pnpm --filter @private-layer/desktop tauri",
+    "build:installer": "pnpm --filter @private-layer/desktop tauri build"
+  },
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
