@@ -9,15 +9,21 @@
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-  <div class="admin-wrap" style="max-width: 640px;">
+  <div class="admin-wrap admin-wide">
     <div class="admin-card">
       <div class="admin-header">
-        <h2>Printable Documents</h2>
+        <h2>Staff Dashboard</h2>
         <button type="button" class="logout-btn" onclick="FTSAdmin.logout()">Sign Out</button>
       </div>
-      <p style="color: #5c6d74; font-size: 0.95rem; margin-bottom: 0.5rem;">
-        Open a document, fill in blanks as needed, then use <strong>Print</strong>.
+      <p class="admin-lead">
+        <strong>Workflow:</strong> 1) Register the test in <a href="verification-log.html">Verification Log</a> to get Report &amp; Specimen IDs ·
+        2) Print the form and fill in blanks · 3) Have donor sign <a href="documents/third-party-release.html">Release form</a> if a third party will verify.
       </p>
+      <a href="verification-log.html" class="doc-link doc-link-featured">
+        <strong>Verification Log — Register Report IDs</strong>
+        <span>Generate FTS-RPT and specimen IDs before printing. Required for online and phone back-checks.</span>
+      </a>
+      <h3 class="section-heading">Printable documents</h3>
       <div class="doc-list">
         <a href="documents/proof-of-testing.html" class="doc-link">
           <strong>Chain of Custody — Nail Keratin Collection</strong>
@@ -30,6 +36,10 @@
         <a href="documents/test-results-negative.html" class="doc-link">
           <strong>14-Panel Nail Keratin — Negative Results</strong>
           <span>Nail matrix laboratory results report with 14-analyte panel and pg/mg cutoffs. Separate from urine screen.</span>
+        </a>
+        <a href="documents/third-party-release.html" class="doc-link">
+          <strong>Third-Party Results Release (HIPAA)</strong>
+          <span>Signed authorization for employers, courts, or agencies to verify results by phone. One page, printable.</span>
         </a>
       </div>
       <a href="../index.html" class="btn-secondary" style="margin-top: 1.5rem;">← Back to Public Website</a>

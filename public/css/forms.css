@@ -347,6 +347,16 @@
   line-height: 1.4;
 }
 
+.form-verification-footer {
+  font-size: 7.5pt;
+  color: #555;
+  line-height: 1.35;
+}
+
+.form-verification-footer strong {
+  color: #264653;
+}
+
 /* Results */
 .results-banner {
   text-align: center;

@@ -1,0 +1,137 @@
+.verify-main {
+  padding: 2.5rem 0 3rem;
+  min-height: calc(100vh - 200px);
+}
+
+.verify-wrap {
+  max-width: 560px;
+}
+
+.verify-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem 1.75rem;
+}
+
+.verify-card h2 {
+  font-family: var(--font-display);
+  color: var(--navy);
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.verify-intro {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.verify-hipaa {
+  background: #f4f8f7;
+  border-left: 4px solid var(--teal);
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.verify-form {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.verify-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 0.35rem;
+}
+
+.verify-field input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #c5d5d2;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.verify-field input:focus {
+  outline: 2px solid rgba(42, 157, 143, 0.35);
+  border-color: var(--teal);
+}
+
+.verify-submit {
+  margin-top: 0.25rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.verify-result {
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.verify-result.success {
+  background: #f0f7f2;
+  border: 2px solid #2e7d4a;
+  color: #1e4d30;
+}
+
+.verify-result.fail {
+  background: #fdf6f5;
+  border: 2px solid #e76f51;
+  color: #7a3b2e;
+}
+
+.verify-result strong {
+  display: block;
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+}
+
+.verify-result dl {
+  margin-top: 0.65rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.verify-result dt {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.verify-result dd {
+  margin: 0 0 0.35rem;
+}
+
+.verify-phone {
+  border-top: 1px solid #e0e8e6;
+  padding-top: 1.25rem;
+}
+
+.verify-phone h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.verify-phone p {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+.verify-phone-note {
+  font-size: 0.8rem !important;
+  color: #888 !important;
+}

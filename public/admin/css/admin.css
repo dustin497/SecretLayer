@@ -168,3 +168,150 @@ body {
   text-align: center;
   margin-top: 1.25rem;
 }
+
+.admin-wide {
+  max-width: 760px;
+}
+
+.admin-lead {
+  color: #5c6d74;
+  font-size: 0.92rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.admin-lead a {
+  color: var(--teal-dark);
+  font-weight: 600;
+}
+
+.section-heading {
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  margin: 1.25rem 0 0.5rem;
+  color: var(--navy);
+}
+
+.doc-link-featured {
+  background: linear-gradient(135deg, #e8f4f2, #f4f8f7);
+  border-color: var(--teal);
+  margin-bottom: 0.5rem;
+}
+
+.admin-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.link-btn {
+  font-size: 0.85rem;
+  color: var(--teal-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.record-form h3 {
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.form-grid .span-2 {
+  grid-column: span 2;
+}
+
+.record-form label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.record-form input,
+.record-form select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #c5d5d2;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.created-banner {
+  background: #f0f7f2;
+  border: 2px solid #2e7d4a;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+
+.id-pair {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.id-pair code {
+  font-family: "Courier New", monospace;
+  font-size: 0.95rem;
+  color: var(--navy);
+}
+
+.copy-btn {
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.record-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.record-table th,
+.record-table td {
+  border: 1px solid #d5e0de;
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+}
+
+.record-table th {
+  background: var(--navy);
+  color: #fff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.record-table tbody tr:nth-child(even) {
+  background: #f7faf9;
+}
+
+@media (max-width: 560px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid .span-2 {
+    grid-column: span 1;
+  }
+}

@@ -24,5 +24,20 @@
       }
       return true;
     },
+    getPassword() {
+      return ADMIN_PASSWORD;
+    },
+    async api(path, options = {}) {
+      const headers = Object.assign(
+        { "X-Admin-Password": ADMIN_PASSWORD },
+        options.headers || {}
+      );
+      const res = await fetch(path, Object.assign({}, options, { headers }));
+      if (res.status === 401) {
+        this.logout();
+        throw new Error("Unauthorized");
+      }
+      return res;
+    },
   };
 })();

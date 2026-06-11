@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Verification Log | Family Testing Services</title>
+  <link rel="icon" href="../images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-wrap admin-wide">
+    <div class="admin-card">
+      <div class="admin-header">
+        <h2>Verification Log</h2>
+        <div class="admin-header-actions">
+          <a href="dashboard.html" class="link-btn">← Documents</a>
+          <button type="button" class="logout-btn" onclick="FTSAdmin.logout()">Sign Out</button>
+        </div>
+      </div>
+
+      <p class="admin-lead">
+        Register each test <strong>before</strong> printing reports. IDs generated here match the public
+        <a href="../verify.html" target="_blank" rel="noopener">verify page</a> and phone back-checks.
+      </p>
+
+      <form id="record-form" class="record-form">
+        <h3>New collection record</h3>
+        <div class="form-grid">
+          <div>
+            <label for="firstName">First name</label>
+            <input type="text" id="firstName" required>
+          </div>
+          <div>
+            <label for="lastName">Last name</label>
+            <input type="text" id="lastName" required>
+          </div>
+          <div>
+            <label for="dob">Date of birth</label>
+            <input type="text" id="dob" placeholder="MM/DD/YYYY" required>
+          </div>
+          <div>
+            <label for="collectionDate">Collection date</label>
+            <input type="text" id="collectionDate" placeholder="MM/DD/YYYY" required>
+          </div>
+          <div>
+            <label for="testType">Test type</label>
+            <select id="testType">
+              <option value="nail-14">14-Panel Nail Keratin</option>
+              <option value="urine-12">12-Panel Urine (Non-DOT)</option>
+              <option value="custody-only">Chain of Custody only</option>
+            </select>
+          </div>
+          <div>
+            <label for="result">Internal result (not shown online)</label>
+            <select id="result">
+              <option value="pending">Pending</option>
+              <option value="negative">Negative</option>
+              <option value="positive">Positive</option>
+            </select>
+          </div>
+          <div class="span-2">
+            <label for="authorizedParty">Authorized party (optional)</label>
+            <input type="text" id="authorizedParty" placeholder="Employer, court, PO — if release on file">
+          </div>
+          <div class="span-2">
+            <label for="notes">Staff notes (internal)</label>
+            <input type="text" id="notes" placeholder="Callback number, release form filed, etc.">
+          </div>
+        </div>
+        <button type="submit" class="btn-primary">Generate Report &amp; Specimen IDs</button>
+        <p id="form-error" class="error"></p>
+      </form>
+
+      <div id="created-banner" class="created-banner" hidden>
+        <strong>Record saved — use these IDs on printed forms:</strong>
+        <div class="id-pair">
+          <span>Report ID: <code id="new-report-id"></code></span>
+          <button type="button" class="copy-btn" data-copy="new-report-id">Copy</button>
+        </div>
+        <div class="id-pair">
+          <span>Specimen ID: <code id="new-specimen-id"></code></span>
+          <button type="button" class="copy-btn" data-copy="new-specimen-id">Copy</button>
+        </div>
+      </div>
+
+      <h3 class="section-heading">Recent records</h3>
+      <p id="load-status" class="hint">Loading…</p>
+      <div class="table-wrap" id="table-wrap" hidden>
+        <table class="record-table">
+          <thead>
+            <tr>
+              <th>Report ID</th>
+              <th>Donor</th>
+              <th>Collected</th>
+              <th>Test</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody id="record-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/verification-log.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Verify a Family Testing Services collection record by Report ID. HIPAA-protected — detailed results require written authorization.">
+  <title>Verify a Test Record | Family Testing Services</title>
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/verify.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <img src="images/logo.png" alt="Family Testing Services logo" width="56" height="56">
+        <div class="brand-text">
+          <h1>Family Testing Services</h1>
+          <span>Compassionate Drug Testing · Est. 2011</span>
+        </div>
+      </a>
+      <div class="header-cta">
+        <a href="tel:2055790707" class="phone-link" aria-label="Call us at 205-579-0707">
+          <span aria-hidden="true">📞</span> (205) 579-0707
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="verify-main">
+    <div class="container verify-wrap">
+      <div class="verify-card">
+        <h2>Verify a Collection Record</h2>
+        <p class="verify-intro">
+          Employers, courts, and authorized parties can confirm that a test was collected at Family Testing Services.
+          Enter the <strong>Report ID</strong> from the printed document plus the donor&apos;s <strong>last name</strong> and <strong>date of birth</strong>.
+        </p>
+
+        <div class="verify-hipaa">
+          <strong>HIPAA notice:</strong> This lookup confirms only that a matching collection record exists.
+          Test results and medical details are <em>not</em> shown online. Callers without written authorization from the donor
+          will be directed to our verification line — we cannot discuss individual health information by phone or web without proper release.
+        </div>
+
+        <form id="verify-form" class="verify-form" novalidate>
+          <div class="verify-field">
+            <label for="reportId">Report ID</label>
+            <input type="text" id="reportId" name="reportId" placeholder="FTS-RPT-2026-00001" required autocomplete="off" spellcheck="false">
+          </div>
+          <div class="verify-field">
+            <label for="lastName">Donor last name</label>
+            <input type="text" id="lastName" name="lastName" placeholder="As shown on the report" required autocomplete="family-name">
+          </div>
+          <div class="verify-field">
+            <label for="dob">Date of birth</label>
+            <input type="text" id="dob" name="dob" placeholder="MM/DD/YYYY" required autocomplete="bday">
+          </div>
+          <button type="submit" class="btn btn-primary verify-submit">Verify Record</button>
+        </form>
+
+        <div id="verify-result" class="verify-result" hidden aria-live="polite"></div>
+
+        <div class="verify-phone">
+          <h3>Phone verification &amp; messages</h3>
+          <p>
+            Call <a href="tel:2055790707"><strong>(205) 579-0707</strong></a> to leave a verification request or schedule a callback.
+            Have the Report ID ready. Staff return calls during business hours after confirming written authorization when required.
+          </p>
+          <p class="verify-phone-note">
+            License: AL-DT-2014-0847 · 1801 2nd Ave N, Ste 204, Bessemer, AL 35020
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-bottom">
+      <p>&copy; 2026 Family Testing Services. All rights reserved. | Alabama DCH License #AL-DT-2014-0847 | HIPAA Compliant</p>
+    </div>
+  </footer>
+
+  <script src="js/verify.js"></script>
+</body>
+</html>
