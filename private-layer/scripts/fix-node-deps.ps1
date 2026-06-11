@@ -1,4 +1,4 @@
-# PrivateLayer — repair broken node_modules (picomatch/vite/esbuild on Windows)
+# PrivateLayer - repair broken node_modules (picomatch/vite/esbuild on Windows)
 # Run from private-layer root:
 #   powershell -ExecutionPolicy Bypass -File scripts\fix-node-deps.ps1
 

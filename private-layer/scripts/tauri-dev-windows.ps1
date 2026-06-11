@@ -1,4 +1,4 @@
-# PrivateLayer — launch Tauri dev with Windows-safe Rust/Node settings
+# PrivateLayer - launch Tauri dev with Windows-safe Rust/Node settings
 # Run from private-layer root:
 #   powershell -ExecutionPolicy Bypass -File scripts\tauri-dev-windows.ps1
 
