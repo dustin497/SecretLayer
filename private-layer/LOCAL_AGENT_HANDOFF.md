@@ -57,7 +57,7 @@ Context:
 Do this in PowerShell (local terminal, not cloud):
 1. cd C:\dev\secretlair-\private-layer
 2. git pull origin cursor/private-layer-scaffold-058f
-3. If node -v shows v24, tell me to install Node 20 LTS first
+3. If node -v shows v24, tell me to install Node 22 LTS first
 4. powershell -ExecutionPolicy Bypass -File scripts\fix-node-deps.ps1
 5. powershell -ExecutionPolicy Bypass -File scripts\tauri-dev-windows.ps1
 6. If agent not running: packages\agent\.venv\Scripts\python.exe -m agent serve (separate window)

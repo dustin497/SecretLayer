@@ -85,11 +85,11 @@ function Need($name, $hint) {
 }
 
 Write-Host "[1/8] Checking prerequisites..." -ForegroundColor Cyan
-Need node "Install Node.js 20 LTS from https://nodejs.org/ (avoid Node 24)"
+Need node "Install Node.js 22 LTS from https://nodejs.org/ (avoid Node 24)"
 $nodeVer = node -v
 Write-Host "  Node $nodeVer" -ForegroundColor Gray
 if ($nodeVer -match "^v24\.") {
-    Write-Host "  WARN Node 24 may break Vite — install Node 20 LTS if dev fails" -ForegroundColor Yellow
+    Write-Host "  WARN Node 24 may break Vite - install Node 22 LTS if dev fails" -ForegroundColor Yellow
 }
 Need python "Install Python 3.11+ from https://www.python.org/ (check Add to PATH)"
 Ensure-Pnpm

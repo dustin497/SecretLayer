@@ -18,7 +18,7 @@ $env:CARGO_BUILD_JOBS = "1"
 $env:CARGO_PROFILE_DEV_DEBUG = "0"
 
 Write-Host ""
-Write-Host "PrivateLayer — tauri dev" -ForegroundColor Cyan
+Write-Host "PrivateLayer - tauri dev" -ForegroundColor Cyan
 Write-Host "  RUST_MIN_STACK=$env:RUST_MIN_STACK" -ForegroundColor Gray
 Write-Host "  CARGO_BUILD_JOBS=$env:CARGO_BUILD_JOBS" -ForegroundColor Gray
 Write-Host "  First compile may take 15-30 minutes. Do not close this window." -ForegroundColor Yellow

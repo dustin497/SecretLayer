@@ -12,7 +12,7 @@ Install these (double-click each installer):
 
 | Tool | Download | Why |
 |------|----------|-----|
-| **Node.js 20 LTS** | https://nodejs.org/ | Builds the app |
+| **Node.js 22 LTS** | https://nodejs.org/ | Builds the app (avoid Node 24) |
 | **Rust** | https://rustup.rs/ | Desktop shell |
 | **VS Build Tools** | https://visualstudio.microsoft.com/visual-cpp-build-tools/ | Check **“Desktop development with C++”** |
 | **Python 3.11+** | https://www.python.org/ | Local agent |

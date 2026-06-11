@@ -7,13 +7,13 @@ $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $Root
 
 Write-Host ""
-Write-Host "=== PrivateLayer — fix Node dependencies ===" -ForegroundColor Cyan
+Write-Host "=== PrivateLayer - fix Node dependencies ===" -ForegroundColor Cyan
 Write-Host ""
 
 $nodeVersion = (node -v)
 Write-Host "Node: $nodeVersion" -ForegroundColor Gray
 if ($nodeVersion -match "^v24\.") {
-    Write-Host "WARN: Node 24 can break Vite. Prefer Node 20 LTS from https://nodejs.org/" -ForegroundColor Yellow
+    Write-Host "WARN: Node 24 can break Vite. Use Node 22 LTS from https://nodejs.org/" -ForegroundColor Yellow
 }
 
 Write-Host "Removing old node_modules..." -ForegroundColor Gray
@@ -28,6 +28,6 @@ if (Get-Command pnpm -ErrorAction SilentlyContinue) {
 if ($LASTEXITCODE -ne 0) { throw "pnpm install failed" }
 
 Write-Host ""
-Write-Host "OK — dependencies reinstalled." -ForegroundColor Green
+Write-Host "OK - dependencies reinstalled." -ForegroundColor Green
 Write-Host "Next: powershell -ExecutionPolicy Bypass -File scripts\tauri-dev-windows.ps1" -ForegroundColor Gray
 Write-Host ""
