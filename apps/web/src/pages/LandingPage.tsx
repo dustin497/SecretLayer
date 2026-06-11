@@ -155,6 +155,12 @@ export function LandingPage({ onOpenWwh2 }: LandingPageProps) {
           Organize API keys, client credentials, provider links, billing pages, renewal dates, and recovery notes in one
           encrypted builder vault.
         </p>
+        <p className="sl-muted" style={{ marginTop: "1rem" }}>
+          <a href="#/proximity" style={{ color: "#a78bfa" }}>
+            Proximity Guard →
+          </a>{" "}
+          — live GPS, Bluetooth &amp; network monitoring for your Galaxy S25 FE.
+        </p>
       </header>
 
       <section className="sl-pricing" data-guide="pricing-section" aria-label="Pricing">

@@ -101,3 +101,125 @@ export interface Wwh2Stats {
   helpfulPercent: number;
   playbookCounts: Record<string, number>;
 }
+
+/** Proximity Guard — device & location awareness */
+
+export type DeviceCategory =
+  | "car"
+  | "watch"
+  | "laptop"
+  | "phone"
+  | "headphones"
+  | "tablet"
+  | "other";
+
+export type DevicePresenceRule =
+  | "always-with-me"
+  | "home-only"
+  | "work-only"
+  | "car-only"
+  | "optional";
+
+export type AnomalySeverity = "info" | "warn" | "alert";
+
+export type AnomalyType =
+  | "unknown_device_nearby"
+  | "known_device_missing"
+  | "known_device_unexpected"
+  | "signal_drop"
+  | "signal_surge"
+  | "location_jump"
+  | "wifi_fingerprint_mismatch";
+
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  altitude?: number | null;
+  speed?: number | null;
+  heading?: number | null;
+  timestamp: string;
+}
+
+export interface BleDeviceReading {
+  id: string;
+  name: string | null;
+  rssi: number;
+  txPower?: number | null;
+  manufacturerData?: string;
+  lastSeen: string;
+}
+
+export interface WifiReading {
+  ssid: string | null;
+  bssid: string | null;
+  rssi: number | null;
+  frequency?: number | null;
+  linkSpeed?: number | null;
+  effectiveType?: string | null;
+  downlinkMbps?: number | null;
+  rttMs?: number | null;
+  saveData?: boolean;
+}
+
+export interface NetworkTrafficSample {
+  timestamp: string;
+  effectiveType: string | null;
+  downlinkMbps: number | null;
+  rttMs: number | null;
+  type: string | null;
+}
+
+export interface KnownDevice {
+  id: string;
+  label: string;
+  category: DeviceCategory;
+  presenceRule: DevicePresenceRule;
+  bleId?: string;
+  bleName?: string;
+  wifiBssid?: string;
+  homeRadiusM?: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface SavedPlace {
+  id: string;
+  label: string;
+  latitude: number;
+  longitude: number;
+  radiusM: number;
+  type: "home" | "work" | "car" | "custom";
+}
+
+export interface ProximitySnapshot {
+  id: string;
+  deviceId: string;
+  location: GeoPoint;
+  bleDevices: BleDeviceReading[];
+  wifi: WifiReading;
+  networkTraffic: NetworkTrafficSample;
+  createdAt: string;
+}
+
+export interface ProximityAnomaly {
+  id: string;
+  type: AnomalyType;
+  severity: AnomalySeverity;
+  title: string;
+  detail: string;
+  relatedDeviceId?: string;
+  relatedBleId?: string;
+  location?: GeoPoint;
+  snapshotId?: string;
+  createdAt: string;
+}
+
+export interface ProximitySession {
+  id: string;
+  deviceId: string;
+  startedAt: string;
+  endedAt?: string;
+  snapshotCount: number;
+  anomalyCount: number;
+}
