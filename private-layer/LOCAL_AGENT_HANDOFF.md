@@ -23,11 +23,11 @@ If `git pull` fails, skip it and run the two scripts anyway.
 
 ## If picomatch / vite still fails
 
-Install Node **20 LTS** (not 24): https://nodejs.org/  
+Install Node **22 LTS** (not 24): https://nodejs.org/  
 Close PowerShell, reopen, then:
 
 ```powershell
-node -v   # must show v20.x
+node -v   # must show v22.x (v20.x also works)
 cd C:\dev\secretlair-\private-layer
 powershell -ExecutionPolicy Bypass -File scripts\fix-node-deps.ps1
 powershell -ExecutionPolicy Bypass -File scripts\tauri-dev-windows.ps1
