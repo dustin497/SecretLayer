@@ -83,6 +83,12 @@ export async function getSnapshots(limit = 50): Promise<ProximitySnapshot[]> {
 
 export async function saveAnomaly(anomaly: ProximityAnomaly): Promise<void> {
   await put("anomalies", anomaly);
+  const all = await getAll<ProximityAnomaly>("anomalies");
+  if (all.length > 200) {
+    const sorted = all.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    const toDelete = sorted.slice(0, all.length - 200);
+    for (const a of toDelete) await remove("anomalies", a.id);
+  }
 }
 
 export async function getAnomalies(limit = 30): Promise<ProximityAnomaly[]> {

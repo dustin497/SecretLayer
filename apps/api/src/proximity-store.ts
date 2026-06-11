@@ -19,11 +19,15 @@ const MAX_ENTRIES = 2000;
 export async function createProximityStore(): Promise<ProximityStore> {
   let snapshots: ProximitySnapshot[] = [];
   let anomalies: ProximityAnomaly[] = [];
+  let persistChain: Promise<void> = Promise.resolve();
 
   async function persist() {
-    await mkdir(DATA_DIR, { recursive: true });
-    await writeFile(SNAPSHOTS_FILE, JSON.stringify(snapshots, null, 2));
-    await writeFile(ANOMALIES_FILE, JSON.stringify(anomalies, null, 2));
+    persistChain = persistChain.then(async () => {
+      await mkdir(DATA_DIR, { recursive: true });
+      await writeFile(SNAPSHOTS_FILE, `${JSON.stringify(snapshots, null, 2)}\n`);
+      await writeFile(ANOMALIES_FILE, `${JSON.stringify(anomalies, null, 2)}\n`);
+    });
+    await persistChain;
   }
 
   return {
@@ -38,6 +42,9 @@ export async function createProximityStore(): Promise<ProximityStore> {
       } catch {
         anomalies = [];
       }
+      console.log(
+        `Proximity: loaded ${snapshots.length} snapshots and ${anomalies.length} anomalies from disk`,
+      );
     },
 
     async addSnapshot(snapshot) {

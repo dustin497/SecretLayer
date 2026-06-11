@@ -5,13 +5,12 @@ import { runPromotionGate } from "@secretlayer/promotion";
 import { fetchHeaders, runSafetySuite } from "@secretlayer/safety-engine";
 import {
   FREE_PLAN_LIMITS,
-  type ProximityAnomaly,
-  type ProximitySnapshot,
   type WaitlistLead,
   type Wwh2Feedback,
   type Wwh2Stats,
 } from "@secretlayer/shared";
 import { createProximityStore, type ProximityStore } from "./proximity-store.js";
+import { parseProximityAnomaly, parseProximitySnapshot } from "./proximity-validate.js";
 import { createWwh2Store, type Wwh2FeedbackStore } from "./wwh2-store.js";
 import { mountWebApp } from "./static.js";
 
@@ -292,11 +291,10 @@ api.get("/vault-items", auth, (_req, res) => {
 });
 
 api.post("/proximity/snapshots", publicLimiter, async (req, res) => {
-  const body = req.body as Partial<ProximitySnapshot>;
-  if (!body.id || !body.deviceId || !body.location || !body.createdAt) {
+  const snapshot = parseProximitySnapshot(req.body);
+  if (!snapshot) {
     return res.status(400).json({ error: "Invalid snapshot payload." });
   }
-  const snapshot = body as ProximitySnapshot;
   try {
     await proximityStore.addSnapshot(snapshot);
     res.status(201).json({ snapshot });
@@ -317,11 +315,10 @@ api.get("/proximity/snapshots", publicLimiter, async (req, res) => {
 });
 
 api.post("/proximity/anomalies", publicLimiter, async (req, res) => {
-  const body = req.body as Partial<ProximityAnomaly>;
-  if (!body.id || !body.type || !body.title || !body.createdAt) {
+  const anomaly = parseProximityAnomaly(req.body);
+  if (!anomaly) {
     return res.status(400).json({ error: "Invalid anomaly payload." });
   }
-  const anomaly = body as ProximityAnomaly;
   try {
     await proximityStore.addAnomaly(anomaly);
     res.status(201).json({ anomaly });

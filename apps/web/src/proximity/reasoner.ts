@@ -48,8 +48,17 @@ function makeAnomaly(
   };
 }
 
+function placeCenter(place: SavedPlace): GeoPoint {
+  return {
+    latitude: place.latitude,
+    longitude: place.longitude,
+    accuracy: 0,
+    timestamp: new Date(0).toISOString(),
+  };
+}
+
 function isAtPlace(point: GeoPoint, place: SavedPlace): boolean {
-  return haversineM(point, { ...point, latitude: place.latitude, longitude: place.longitude }) <= place.radiusM;
+  return haversineM(point, placeCenter(place)) <= place.radiusM;
 }
 
 function findPlaceAt(point: GeoPoint, places: SavedPlace[]): SavedPlace | undefined {
@@ -107,6 +116,17 @@ export function analyzeSnapshot(
             "alert",
             `${known.label} seen away from home`,
             `Your ${known.category} "${known.label}" was detected at an unexpected location.`,
+            { relatedDeviceId: known.id, relatedBleId: ble.id, location: loc, snapshotId: snapshot.id },
+          ),
+        );
+      }
+      if (known.presenceRule === "work-only" && currentPlace?.type !== "work") {
+        anomalies.push(
+          makeAnomaly(
+            "known_device_unexpected",
+            "warn",
+            `${known.label} seen away from work`,
+            `Your ${known.category} "${known.label}" was detected outside your work zone.`,
             { relatedDeviceId: known.id, relatedBleId: ble.id, location: loc, snapshotId: snapshot.id },
           ),
         );

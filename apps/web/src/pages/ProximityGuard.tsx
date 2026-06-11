@@ -80,6 +80,13 @@ export function ProximityGuard() {
     void loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    return () => {
+      engineRef.current?.stop();
+      engineRef.current = null;
+    };
+  }, []);
+
   const startMonitoring = useCallback(async () => {
     setError(null);
     const known = await getKnownDevices();
@@ -163,7 +170,7 @@ export function ProximityGuard() {
   return (
     <div className="pg-page">
       <header className="pg-header">
-        <a href="#" className="pg-back">
+        <a href="/" className="pg-back">
           ← SecretLayer
         </a>
         <p className="pg-eyebrow">Proximity Guard</p>
@@ -352,7 +359,12 @@ export function ProximityGuard() {
                   <button
                     type="button"
                     className="pg-btn-small danger"
-                    onClick={() => void deleteKnownDevice(d.id).then(loadData)}
+                    onClick={() =>
+                      void deleteKnownDevice(d.id).then(async () => {
+                        await loadData();
+                        engineRef.current?.setKnownDevices(await getKnownDevices());
+                      })
+                    }
                   >
                     Remove
                   </button>
@@ -408,7 +420,12 @@ export function ProximityGuard() {
                   <button
                     type="button"
                     className="pg-btn-small danger"
-                    onClick={() => void deletePlace(p.id).then(loadData)}
+                    onClick={() =>
+                      void deletePlace(p.id).then(async () => {
+                        await loadData();
+                        engineRef.current?.setPlaces(await getPlaces());
+                      })
+                    }
                   >
                     Remove
                   </button>

@@ -141,7 +141,7 @@ export class ProximityEngine {
   }
 
   private async captureSnapshot() {
-    if (!this.location) return;
+    if (!this.running || !this.location) return;
 
     const snapshot: ProximitySnapshot = {
       id: crypto.randomUUID(),
