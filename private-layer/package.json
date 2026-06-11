@@ -11,6 +11,11 @@
     "build:installer": "pnpm --filter @private-layer/desktop tauri build"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20 <23"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

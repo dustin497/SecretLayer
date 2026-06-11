@@ -85,7 +85,12 @@ function Need($name, $hint) {
 }
 
 Write-Host "[1/8] Checking prerequisites..." -ForegroundColor Cyan
-Need node "Install Node.js 20+ from https://nodejs.org/"
+Need node "Install Node.js 20 LTS from https://nodejs.org/ (avoid Node 24)"
+$nodeVer = node -v
+Write-Host "  Node $nodeVer" -ForegroundColor Gray
+if ($nodeVer -match "^v24\.") {
+    Write-Host "  WARN Node 24 may break Vite — install Node 20 LTS if dev fails" -ForegroundColor Yellow
+}
 Need python "Install Python 3.11+ from https://www.python.org/ (check Add to PATH)"
 Ensure-Pnpm
 if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
@@ -107,8 +112,11 @@ if (Test-Path $gpuScript) {
 
 Write-Host ""
 Write-Host "[3/8] Node + Python setup..." -ForegroundColor Cyan
-Invoke-Pnpm install
-if ($LASTEXITCODE -ne 0) { throw "pnpm install failed" }
+if ($Root -match "OneDrive") {
+    Write-Host "  WARN OneDrive path — copy project to C:\dev\ for reliable Rust builds" -ForegroundColor Yellow
+}
+& powershell -ExecutionPolicy Bypass -File (Join-Path $Root "scripts\fix-node-deps.ps1")
+if ($LASTEXITCODE -ne 0) { throw "fix-node-deps failed" }
 
 $agentDir = Join-Path $Root "packages\agent"
 Set-Location $agentDir
@@ -123,6 +131,16 @@ Write-Host "[4/8] Ollama..." -ForegroundColor Cyan
 if (Get-Command ollama -ErrorAction SilentlyContinue) {
     Write-Host "  Ollama installed" -ForegroundColor Green
     $model = "qwen2.5:7b"
+    try {
+        $gpu = Get-CimInstance Win32_VideoController -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -and $_.Name -notmatch "Microsoft Basic" } |
+            Select-Object -First 1
+        if ($gpu -and $gpu.Name -match "Intel") { $model = "qwen2.5:1.5b" }
+    } catch { }
+    if (Test-Path ".env") {
+        $envLine = Get-Content ".env" | Where-Object { $_ -match '^DEFAULT_MODEL=' } | Select-Object -First 1
+        if ($envLine) { $model = ($envLine -split '=', 2)[1].Trim() }
+    }
     Write-Host "  Pulling $model (first time may take several minutes)..." -ForegroundColor Gray
     ollama pull $model
     if (-not (Get-Process ollama -ErrorAction SilentlyContinue)) {
@@ -177,9 +195,9 @@ if (Test-Path $installedExe) {
     Start-Process $releaseExe
     Write-Host "  Launched release build" -ForegroundColor Green
 } elseif (Get-Command cargo -ErrorAction SilentlyContinue) {
-    Write-Host "  Starting pnpm tauri dev (first compile takes 5-15 min)..." -ForegroundColor Yellow
-    Set-Location $Root
-    Invoke-Pnpm tauri dev
+    Write-Host "  Starting pnpm tauri dev (first compile takes 15-30 min on low-RAM PCs)..." -ForegroundColor Yellow
+    & powershell -ExecutionPolicy Bypass -File (Join-Path $Root "scripts\tauri-dev-windows.ps1")
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 } else {
     Write-Host "  Install Rust, then run: pnpm tauri dev" -ForegroundColor Red
     Write-Host "  Or build installer: scripts\build-combined-installer.ps1" -ForegroundColor Yellow

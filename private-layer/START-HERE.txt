@@ -1,8 +1,13 @@
 PRIVATE LAYER — ONE COMMAND ON YOUR WINDOWS PC
 
-  cd private-layer
+  cd C:\dev\secretlair-\private-layer
+  git pull origin cursor/private-layer-scaffold-058f
+  powershell -ExecutionPolicy Bypass -File scripts\fix-node-deps.ps1
+  powershell -ExecutionPolicy Bypass -File scripts\tauri-dev-windows.ps1
+
+Or full setup + launch:
+
   powershell -ExecutionPolicy Bypass -File scripts\run-all-windows.ps1
 
-That runs setup, Ollama check, agent, and opens the app.
-
 Full guide: docs\INSTALL-WINDOWS.md
+Local agent handoff: LOCAL_AGENT_HANDOFF.md
