@@ -1,4 +1,4 @@
-/* Printable nail testing forms — screen + print */
+/* Printable clinic forms — screen + print */
 
 .form-page-body {
   background: #e8ecef;
@@ -42,10 +42,10 @@
   max-width: 8.5in;
   margin: 0 auto;
   background: #fff;
-  padding: 0.55in 0.6in;
+  padding: 0.5in 0.55in;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
-  font-size: 10.5pt;
-  line-height: 1.45;
+  font-size: 10pt;
+  line-height: 1.4;
 }
 
 .form-header {
@@ -53,34 +53,52 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
-  border-bottom: 3px solid #2a9d8f;
-  padding-bottom: 0.75rem;
-  margin-bottom: 1rem;
+  border-bottom: 2px solid #264653;
+  padding-bottom: 0.65rem;
+  margin-bottom: 0.85rem;
 }
 
 .form-header-brand {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.6rem;
 }
 
 .form-header-brand img {
-  width: 64px;
-  height: 64px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
 }
 
 .form-header-brand h1 {
-  font-family: Georgia, serif;
-  font-size: 15pt;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14pt;
   color: #264653;
-  line-height: 1.2;
+  line-height: 1.15;
+  font-weight: 700;
 }
 
 .form-header-brand p {
-  font-size: 8.5pt;
+  font-size: 8pt;
   color: #5c6d74;
-  margin-top: 0.15rem;
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+.form-doc-meta {
+  text-align: right;
+  flex-shrink: 0;
+  font-size: 8pt;
+  color: #5c6d74;
+  min-width: 150px;
+}
+
+.form-doc-meta .doc-id {
+  font-family: "Courier New", monospace;
+  font-size: 9pt;
+  color: #264653;
+  letter-spacing: 0.04em;
+  margin-top: 0.25rem;
 }
 
 .form-barcode-block {
@@ -89,73 +107,104 @@
 }
 
 .form-barcode-block .barcode-label {
-  font-size: 7.5pt;
+  font-size: 7pt;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.2rem;
-}
-
-.barcode {
-  display: inline-block;
+  margin-bottom: 0.15rem;
 }
 
 .barcode svg {
-  height: 42px;
+  height: 38px;
   width: auto;
 }
 
 .barcode-num {
   font-family: "Courier New", monospace;
-  font-size: 9pt;
-  letter-spacing: 2px;
-  margin-top: 0.15rem;
+  font-size: 8.5pt;
+  letter-spacing: 1.5px;
+  margin-top: 0.1rem;
 }
 
 .form-title {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .form-title h2 {
-  font-family: Georgia, serif;
-  font-size: 13pt;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 12.5pt;
   color: #1d6f65;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
+  font-weight: 700;
 }
 
 .form-title p {
-  font-size: 9pt;
+  font-size: 8.5pt;
   color: #5c6d74;
+  margin-top: 0.2rem;
+}
+
+.form-badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.45rem;
+}
+
+.form-badge {
+  display: inline-block;
+  font-size: 7.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid #c5d5d2;
+  color: #264653;
+  background: #f4f8f7;
+}
+
+.form-badge.accent {
+  border-color: #2a9d8f;
+  color: #1d6f65;
+  background: #e8f4f2;
 }
 
 .form-section {
-  margin-bottom: 0.85rem;
-  border: 1px solid #c5d5d2;
-  border-radius: 4px;
+  margin-bottom: 0.7rem;
+  border: 1px solid #b8c9c6;
+  border-radius: 3px;
   overflow: hidden;
+  page-break-inside: avoid;
 }
 
 .form-section-title {
-  background: #e8f4f2;
-  padding: 0.35rem 0.6rem;
-  font-size: 9pt;
+  background: #264653;
+  padding: 0.3rem 0.55rem;
+  font-size: 8.5pt;
   font-weight: 700;
-  color: #1d6f65;
+  color: #fff;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid #c5d5d2;
+  letter-spacing: 0.05em;
 }
 
 .form-section-body {
-  padding: 0.55rem 0.65rem;
+  padding: 0.5rem 0.55rem;
+}
+
+.form-section-body p.lead {
+  font-size: 8.5pt;
+  margin-bottom: 0.45rem;
+  color: #444;
 }
 
 .form-row {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 0.55rem;
+  gap: 0.85rem;
+  margin-bottom: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -165,191 +214,255 @@
 
 .form-field {
   flex: 1;
-  min-width: 140px;
+  min-width: 130px;
 }
 
 .form-field label {
   display: block;
-  font-size: 8pt;
-  color: #5c6d74;
-  margin-bottom: 0.15rem;
+  font-size: 7.5pt;
+  color: #4a5a62;
+  margin-bottom: 0.12rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .form-field .blank {
-  border-bottom: 1px solid #333;
-  min-height: 1.35rem;
-  padding: 0.1rem 0;
+  border-bottom: 1px solid #222;
+  min-height: 1.25rem;
+  padding: 0.05rem 0;
+  font-size: 9.5pt;
 }
 
-.form-field .blank.tall {
-  min-height: 2.5rem;
+.form-field .blank.prefilled {
+  border-bottom-style: dotted;
+  color: #333;
 }
 
 .form-check-row {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
-  margin-top: 0.35rem;
+  margin-top: 0.3rem;
 }
 
 .form-check {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 9.5pt;
+  gap: 0.3rem;
+  font-size: 9pt;
 }
 
 .form-check .box {
-  width: 14px;
-  height: 14px;
-  border: 1.5px solid #333;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid #222;
   flex-shrink: 0;
 }
 
 .form-notice {
-  background: #fff8e6;
-  border: 1px solid #e6c84a;
-  border-radius: 4px;
-  padding: 0.5rem 0.65rem;
-  font-size: 9pt;
-  margin-bottom: 0.85rem;
+  background: #f8f9fa;
+  border-left: 3px solid #2a9d8f;
+  padding: 0.45rem 0.6rem;
+  font-size: 8.5pt;
+  margin-bottom: 0.75rem;
+  color: #444;
 }
 
 .form-notice strong {
-  color: #8a6d00;
+  color: #264653;
+}
+
+.form-disclaimer {
+  font-size: 7.5pt;
+  color: #666;
+  line-height: 1.35;
+  margin-top: 0.5rem;
 }
 
 .shipping-track {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
-  padding: 0.5rem 0;
+  padding: 0.4rem 0;
 }
 
 .shipping-arrow {
-  font-size: 14pt;
+  font-size: 13pt;
   color: #2a9d8f;
+  font-weight: 700;
 }
 
 .lab-destination {
   background: #f4f8f7;
-  border: 1px dashed #2a9d8f;
-  padding: 0.5rem 0.65rem;
-  border-radius: 4px;
-  font-size: 9pt;
+  border: 1px solid #b8c9c6;
+  padding: 0.45rem 0.55rem;
+  border-radius: 3px;
+  font-size: 8.5pt;
+  flex: 1;
+  min-width: 200px;
 }
 
 .turnaround-box {
   background: #264653;
   color: #fff;
-  padding: 0.45rem 0.75rem;
-  border-radius: 4px;
-  font-size: 9pt;
+  padding: 0.4rem 0.65rem;
+  border-radius: 3px;
+  font-size: 8.5pt;
   text-align: center;
 }
 
 .turnaround-box strong {
   color: #f4a261;
-  font-size: 10.5pt;
+  font-size: 10pt;
 }
 
 .form-sig-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
 }
 
 .sig-line {
-  border-bottom: 1px solid #333;
-  min-height: 1.5rem;
-  margin-bottom: 0.2rem;
+  border-bottom: 1px solid #222;
+  min-height: 1.4rem;
+  margin-bottom: 0.15rem;
 }
 
 .sig-label {
-  font-size: 8pt;
-  color: #666;
+  font-size: 7.5pt;
+  color: #555;
 }
 
 .form-footer {
-  margin-top: 1rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #ddd;
-  font-size: 7.5pt;
-  color: #888;
+  margin-top: 0.85rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid #ccc;
+  font-size: 7pt;
+  color: #777;
   text-align: center;
+  line-height: 1.4;
 }
 
-/* Results page */
+/* Results */
 .results-banner {
   text-align: center;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border-radius: 4px;
+  padding: 0.65rem 0.75rem;
+  margin-bottom: 0.85rem;
+  border-radius: 3px;
+  page-break-inside: avoid;
 }
 
 .results-banner.clean {
-  background: #e6f4ea;
-  border: 2px solid #34a853;
+  background: #f0f7f2;
+  border: 2px solid #2e7d4a;
 }
 
 .results-banner h2 {
-  font-family: Georgia, serif;
-  font-size: 16pt;
-  color: #1e7e34;
-  letter-spacing: 0.08em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14pt;
+  color: #1e6b38;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.results-banner .result-code {
+  font-size: 9pt;
+  font-weight: 700;
+  color: #1e6b38;
+  margin-top: 0.15rem;
+  text-transform: uppercase;
 }
 
 .results-banner p {
-  font-size: 9.5pt;
-  color: #2d6a3e;
-  margin-top: 0.25rem;
+  font-size: 8.5pt;
+  color: #2d5a3d;
+  margin-top: 0.2rem;
 }
 
 .results-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 9.5pt;
-  margin: 0.75rem 0;
+  font-size: 8.5pt;
 }
 
 .results-table th,
 .results-table td {
-  border: 1px solid #bbb;
-  padding: 0.35rem 0.5rem;
+  border: 1px solid #999;
+  padding: 0.3rem 0.45rem;
   text-align: left;
+  vertical-align: top;
 }
 
 .results-table th {
-  background: #e8f4f2;
-  font-size: 8.5pt;
+  background: #264653;
+  color: #fff;
+  font-size: 7.5pt;
   text-transform: uppercase;
-  color: #1d6f65;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+
+.results-table tbody tr:nth-child(even) {
+  background: #f7faf9;
 }
 
 .results-table .neg {
-  color: #1e7e34;
+  color: #1e6b38;
   font-weight: 700;
+}
+
+.results-table .col-drug {
+  width: 38%;
+}
+
+.results-table .col-cutoff {
+  width: 18%;
+}
+
+.results-table .col-result {
+  width: 22%;
+}
+
+.results-table .col-status {
+  width: 22%;
 }
 
 .results-meta {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.results-meta.three-col {
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .cert-stamp {
-  border: 2px solid #2a9d8f;
-  border-radius: 4px;
-  padding: 0.5rem;
+  border: 1.5px solid #264653;
+  border-radius: 3px;
+  padding: 0.45rem 0.55rem;
   text-align: center;
+  font-size: 8pt;
+  color: #264653;
+  margin-top: 0.65rem;
+  background: #f8fafa;
+}
+
+.interpretation-box {
+  border: 1px solid #b8c9c6;
+  background: #fafcfc;
+  padding: 0.5rem 0.55rem;
   font-size: 8.5pt;
-  color: #1d6f65;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.interpretation-box strong {
+  color: #264653;
 }
 
 @media print {
@@ -359,12 +472,20 @@
   }
 
   .form-toolbar {
-    display: none;
+    display: none !important;
   }
 
   .form-sheet {
     box-shadow: none;
     max-width: none;
-    padding: 0.4in;
+    padding: 0.35in 0.4in;
+  }
+
+  .form-section {
+    page-break-inside: avoid;
+  }
+
+  .results-table {
+    font-size: 8pt;
   }
 }
