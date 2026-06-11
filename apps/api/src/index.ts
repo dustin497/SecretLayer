@@ -5,10 +5,13 @@ import { runPromotionGate } from "@secretlayer/promotion";
 import { fetchHeaders, runSafetySuite } from "@secretlayer/safety-engine";
 import {
   FREE_PLAN_LIMITS,
+  type ProximityAnomaly,
+  type ProximitySnapshot,
   type WaitlistLead,
   type Wwh2Feedback,
   type Wwh2Stats,
 } from "@secretlayer/shared";
+import { createProximityStore, type ProximityStore } from "./proximity-store.js";
 import { createWwh2Store, type Wwh2FeedbackStore } from "./wwh2-store.js";
 import { mountWebApp } from "./static.js";
 
@@ -55,6 +58,7 @@ const sessions = new Map<string, string>();
 const projects = new Map<string, { id: string; userId: string; name: string }>();
 const waitlistLeads = new Map<string, WaitlistLead>();
 let wwh2Store: Wwh2FeedbackStore;
+let proximityStore: ProximityStore;
 
 function auth(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
@@ -287,11 +291,72 @@ api.get("/vault-items", auth, (_req, res) => {
   res.json({ vaultItems: [] });
 });
 
+api.post("/proximity/snapshots", publicLimiter, async (req, res) => {
+  const body = req.body as Partial<ProximitySnapshot>;
+  if (!body.id || !body.deviceId || !body.location || !body.createdAt) {
+    return res.status(400).json({ error: "Invalid snapshot payload." });
+  }
+  const snapshot = body as ProximitySnapshot;
+  try {
+    await proximityStore.addSnapshot(snapshot);
+    res.status(201).json({ snapshot });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save snapshot.", detail: String(err) });
+  }
+});
+
+api.get("/proximity/snapshots", publicLimiter, async (req, res) => {
+  const deviceId = req.query.deviceId as string | undefined;
+  const limit = Math.min(Number(req.query.limit) || 50, 100);
+  try {
+    const snapshots = await proximityStore.getSnapshots(deviceId, limit);
+    res.json({ snapshots });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load snapshots.", detail: String(err) });
+  }
+});
+
+api.post("/proximity/anomalies", publicLimiter, async (req, res) => {
+  const body = req.body as Partial<ProximityAnomaly>;
+  if (!body.id || !body.type || !body.title || !body.createdAt) {
+    return res.status(400).json({ error: "Invalid anomaly payload." });
+  }
+  const anomaly = body as ProximityAnomaly;
+  try {
+    await proximityStore.addAnomaly(anomaly);
+    res.status(201).json({ anomaly });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to save anomaly.", detail: String(err) });
+  }
+});
+
+api.get("/proximity/anomalies", publicLimiter, async (req, res) => {
+  const deviceId = req.query.deviceId as string | undefined;
+  const limit = Math.min(Number(req.query.limit) || 50, 100);
+  try {
+    const anomalies = await proximityStore.getAnomalies(deviceId, limit);
+    res.json({ anomalies });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load anomalies.", detail: String(err) });
+  }
+});
+
+api.get("/proximity/stats", publicLimiter, async (_req, res) => {
+  try {
+    const counts = await proximityStore.count();
+    res.json({ ...counts, store: "file" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to load stats.", detail: String(err) });
+  }
+});
+
 app.use("/api", api);
 app.use(api);
 
 wwh2Store = await createWwh2Store();
 await wwh2Store.load();
+proximityStore = await createProximityStore();
+await proximityStore.load();
 
 const servingWeb = mountWebApp(app);
 
