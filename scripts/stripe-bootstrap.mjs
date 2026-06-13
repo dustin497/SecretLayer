@@ -131,6 +131,7 @@ const envLines = [
   `STRIPE_PAYMENT_LINK_PRO=${out.STRIPE_PAYMENT_LINK_PRO}`,
   webhookSecret ? `STRIPE_WEBHOOK_SECRET=${webhookSecret}` : "# STRIPE_WEBHOOK_SECRET=whsec_...",
   `WEB_ORIGIN=${webOrigin}`,
+  `API_ORIGIN=${apiOrigin}`,
 ].join("\n");
 
 const envPath = resolve(process.cwd(), ".env.stripe.generated");
