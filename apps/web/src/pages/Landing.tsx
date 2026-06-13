@@ -10,7 +10,7 @@ const features = [
   { title: "Promotion gate", detail: "Marketing and deploys only run after safety nets pass. Leads get nurture when you ship safe." },
 ];
 
-export function Landing() {
+export function Landing({ onOpenWwh2 }: { onOpenWwh2?: () => void }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<string | null>(null);
 
@@ -75,6 +75,13 @@ export function Landing() {
           <button type="button" className="btn ghost" onClick={joinWaitlist}>Join</button>
         </div>
         {status && <p className="status">{status}</p>}
+        {onOpenWwh2 && (
+          <p style={{ marginTop: "1.25rem" }}>
+            <button type="button" className="wwh2-powered-badge" onClick={onOpenWwh2}>
+              Powered by WWH2 guided help
+            </button>
+          </p>
+        )}
       </footer>
       </div>
     </SiteLayout>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { ApiLandingPage } from "./pages/ApiLanding";
@@ -9,6 +10,7 @@ import { GuideArticle, GuidesIndex } from "./pages/Guides";
 import { Landing } from "./pages/Landing";
 import { ReferralPage } from "./pages/Referral";
 import { SafetyPage } from "./pages/Safety";
+import { WWH2Panel } from "./wwh2/WWH2Panel";
 
 function Protected({ children }: { children: ReactNode }) {
   const { session } = useAuth();
@@ -17,11 +19,13 @@ function Protected({ children }: { children: ReactNode }) {
 }
 
 export function App() {
+  const [wwh2MenuTrigger, setWwh2MenuTrigger] = useState(0);
+
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Landing onOpenWwh2={() => setWwh2MenuTrigger((n) => n + 1)} />} />
           <Route path="/for/:slug" element={<ApiLandingPage />} />
           <Route path="/calculator" element={<CostCalculator />} />
           <Route path="/referral" element={<ReferralPage />} />
@@ -34,6 +38,7 @@ export function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
+      <WWH2Panel openMenuTrigger={wwh2MenuTrigger} />
     </AuthProvider>
   );
 }

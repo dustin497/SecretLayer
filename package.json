@@ -7,7 +7,10 @@
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "dev:web": "pnpm --filter @secretlayer/web dev",
+    "dev:family-testing": "python3 -m http.server 8080 --bind 0.0.0.0 --directory family-testing-services",
     "dev:api": "pnpm --filter @secretlayer/api dev",
+    "build:netlify": "pnpm --filter @secretlayer/web build",
+    "build:railway": "pnpm run build:netlify && pnpm --filter @secretlayer/api build",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
@@ -22,5 +25,10 @@
   },
   "devDependencies": {
     "stripe": "^22.2.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

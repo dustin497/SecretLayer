@@ -123,3 +123,29 @@ export {
   type PlanDefinition,
   type PlanLimits,
 } from "./plans.js";
+
+export interface WaitlistLead {
+  id: string;
+  email: string;
+  source: string;
+  createdAt: string;
+}
+
+export interface Wwh2Feedback {
+  id: string;
+  playbookId: string;
+  playbookTitle: string;
+  rating: number;
+  helpful: boolean;
+  comment?: string;
+  completedSteps: number;
+  totalSteps: number;
+  createdAt: string;
+}
+
+export interface Wwh2Stats {
+  totalSessions: number;
+  averageRating: number;
+  helpfulPercent: number;
+  playbookCounts: Record<string, number>;
+}
