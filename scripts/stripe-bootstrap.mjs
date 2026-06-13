@@ -9,17 +9,7 @@
 import Stripe from "stripe";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-
-function resolveStripeSecretKey() {
-  return (
-    process.env.STRIPE_SECRET_KEY ||
-    process.env.stripe ||
-    process.env.STRIPE ||
-    process.env.BRAND_AGENT_STRIPE_KEY ||
-    process.env.BRAND_AGENTS_STRIPE_KEY ||
-    process.env.BRAND_AGENT_STRIPE_SECRET_KEY
-  );
-}
+import { resolveStripeSecretKey } from "./stripe-env.mjs";
 
 const key = resolveStripeSecretKey();
 const live = process.argv.includes("--live");
@@ -31,10 +21,10 @@ if (!key) {
 SecretLayer Stripe bootstrap — missing Stripe secret key
 
 Accepted secret names in Cursor (pick ONE):
-  stripe          ← common Cursor name
+  Stripe          ← your name (any casing works)
+  stripe
   STRIPE_SECRET_KEY
   BRAND_AGENT_STRIPE_KEY
-  BRAND_AGENTS_STRIPE_KEY
 
 Your Mirror Path AI site uses Payment Link:
   https://buy.stripe.com/bJebJ1dTlfnvdCn4aZbV600
