@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CloudBank — Your Bank in the Cloud</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="auth-screen" class="screen">
+      <div class="auth-layout">
+        <aside class="auth-hero">
+          <div class="brand">
+            <div class="brand-mark">CB</div>
+            <div>
+              <h1>CloudBank</h1>
+              <p>Run your bank from anywhere</p>
+            </div>
+          </div>
+          <ul class="hero-features">
+            <li>Checking &amp; savings accounts</li>
+            <li>Instant transfers between accounts</li>
+            <li>Full transaction history</li>
+            <li>Deployed in the cloud on Render</li>
+          </ul>
+          <p class="hero-note">Demo banking app — not a licensed financial institution.</p>
+        </aside>
+        <main class="auth-panel">
+          <div class="tabs">
+            <button class="tab active" data-tab="login">Sign in</button>
+            <button class="tab" data-tab="register">Open account</button>
+          </div>
+          <form id="login-form" class="auth-form">
+            <h2>Welcome back</h2>
+            <label>Email<input type="email" name="email" required autocomplete="email" /></label>
+            <label>Password<input type="password" name="password" required autocomplete="current-password" /></label>
+            <button type="submit" class="btn btn-primary">Sign in</button>
+          </form>
+          <form id="register-form" class="auth-form hidden">
+            <h2>Open your account</h2>
+            <label>Full name<input type="text" name="fullName" required autocomplete="name" /></label>
+            <label>Email<input type="email" name="email" required autocomplete="email" /></label>
+            <label>Password<input type="password" name="password" required minlength="8" autocomplete="new-password" /></label>
+            <p class="hint">Minimum 8 characters. New accounts get $1,000 checking + $500 savings.</p>
+            <button type="submit" class="btn btn-primary">Create account</button>
+          </form>
+          <p id="auth-error" class="error hidden"></p>
+        </main>
+      </div>
+    </div>
+
+    <div id="dashboard-screen" class="screen hidden">
+      <header class="topbar">
+        <div class="brand compact">
+          <div class="brand-mark">CB</div>
+          <span>CloudBank</span>
+        </div>
+        <div class="topbar-right">
+          <span id="user-greeting"></span>
+          <button id="logout-btn" class="btn btn-ghost">Sign out</button>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <section class="summary-card">
+          <p class="eyebrow">Total balance</p>
+          <h2 id="total-balance">$0.00</h2>
+          <p class="subtle">Across all your accounts</p>
+        </section>
+
+        <section class="grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Your accounts</h3>
+            </div>
+            <div id="accounts-list" class="accounts-list"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h3>Quick actions</h3>
+            </div>
+            <form id="action-form" class="action-form">
+              <label>Account
+                <select id="action-account" name="accountId" required></select>
+              </label>
+              <label>Action
+                <select id="action-type" name="actionType">
+                  <option value="deposit">Deposit</option>
+                  <option value="withdraw">Withdraw</option>
+                  <option value="transfer">Transfer to another account</option>
+                </select>
+              </label>
+              <label id="transfer-target-wrap" class="hidden">Transfer to
+                <select id="transfer-target" name="toAccountId"></select>
+              </label>
+              <label>Amount
+                <input type="number" id="action-amount" name="amount" min="0.01" step="0.01" required placeholder="0.00" />
+              </label>
+              <label>Description
+                <input type="text" id="action-description" name="description" maxlength="120" placeholder="Optional note" />
+              </label>
+              <button type="submit" class="btn btn-primary">Submit</button>
+              <p id="action-error" class="error hidden"></p>
+              <p id="action-success" class="success hidden"></p>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Recent transactions</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Account</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th class="num">Amount</th>
+                  <th class="num">Balance</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="/js/app.js"></script>
+</body>
+</html>
