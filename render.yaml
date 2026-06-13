@@ -9,3 +9,24 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
+  - type: web
+    name: cloudbank
+    runtime: node
+    plan: free
+    rootDir: bank-app
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cloudbank-db
+          property: connectionString
+
+databases:
+  - name: cloudbank-db
+    databaseName: cloudbank
+    plan: free
