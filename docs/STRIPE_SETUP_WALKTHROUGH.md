@@ -26,6 +26,14 @@ This is where you enter bank information for **receiving** money (not paying).
    - Start with **Test mode** (toggle top-right) → `sk_test_...`
 2. From the repo root:
 
+**Cursor Cloud:** save your key as a secret named `stripe` (or `STRIPE_SECRET_KEY`), then start a new agent and run:
+
+```bash
+pnpm stripe:setup
+```
+
+**Local shell** (paste key inline):
+
 ```bash
 STRIPE_SECRET_KEY=sk_test_xxxxxxxx pnpm stripe:setup
 ```

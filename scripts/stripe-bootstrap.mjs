@@ -13,6 +13,8 @@ import { resolve } from "node:path";
 function resolveStripeSecretKey() {
   return (
     process.env.STRIPE_SECRET_KEY ||
+    process.env.stripe ||
+    process.env.STRIPE ||
     process.env.BRAND_AGENT_STRIPE_KEY ||
     process.env.BRAND_AGENTS_STRIPE_KEY ||
     process.env.BRAND_AGENT_STRIPE_SECRET_KEY
@@ -29,6 +31,7 @@ if (!key) {
 SecretLayer Stripe bootstrap — missing Stripe secret key
 
 Accepted secret names in Cursor (pick ONE):
+  stripe          ← common Cursor name
   STRIPE_SECRET_KEY
   BRAND_AGENT_STRIPE_KEY
   BRAND_AGENTS_STRIPE_KEY
