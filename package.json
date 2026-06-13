@@ -16,7 +16,11 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "safety:run": "pnpm --filter @secretlayer/safety-engine cli",
-    "promote:check": "pnpm --filter @secretlayer/promotion cli"
+    "promote:check": "pnpm --filter @secretlayer/promotion cli",
+    "stripe:setup": "node scripts/stripe-bootstrap.mjs"
+  },
+  "devDependencies": {
+    "stripe": "^22.2.0"
   },
   "engines": {
     "node": ">=20"
