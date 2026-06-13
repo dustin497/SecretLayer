@@ -1,0 +1,41 @@
+name: Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: ci-integration-secret
+      SAFETY_SCORE: "84"
+      SAFETY_PASSED: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm typecheck
+      - name: Safety scan production
+        run: pnpm safety:run https://secretlayer.net .
+      - name: Promotion gate (dry run)
+        run: pnpm promote:check https://secretlayer.net 0.3.0
+      - name: Upload promotion artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-output
+          path: promotion-output/
+          if-no-files-found: ignore

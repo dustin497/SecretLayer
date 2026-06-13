@@ -1,6 +1,6 @@
 {
   "name": "secretlayer",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "private": true,
   "description": "SecretLayer — vault-first secrets for builders. Projects, encrypted vaults, safety nets, and promotion gates.",
   "packageManager": "pnpm@10.33.3",
@@ -16,10 +16,15 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "safety:run": "pnpm --filter @secretlayer/safety-engine cli",
-    "promote:check": "pnpm --filter @secretlayer/promotion cli"
+    "promote:check": "pnpm --filter @secretlayer/promotion cli",
+    "integrate": "pnpm build && pnpm test && pnpm safety:run https://secretlayer.net . && pnpm promote:check https://secretlayer.net 0.3.0",
+    "stripe:setup": "node scripts/stripe-bootstrap.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "stripe": "^22.2.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

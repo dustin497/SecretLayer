@@ -3,22 +3,85 @@
   font-family: ui-sans-serif, system-ui, sans-serif;
   background: #0b1220;
   color: #e2e8f0;
+  line-height: 1.5;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; }
+a { color: #67e8f9; }
+button, input, textarea { font: inherit; }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-}
+.page { max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.page.narrow { max-width: 480px; }
+.hero h1 { font-size: clamp(2rem, 5vw, 2.75rem); margin: 0.5rem 0; line-height: 1.1; }
+.eyebrow { color: #67e8f9; letter-spacing: 0.12em; font-size: 0.75rem; text-transform: uppercase; margin: 0; }
+.lede { color: #94a3b8; font-size: 1.1rem; max-width: 640px; }
+.muted { color: #94a3b8; }
+.error { color: #fca5a5; }
+.status { color: #a5f3fc; margin-top: 1rem; }
 
-button,
-input,
-textarea {
-  font: inherit;
+.actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.25rem; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.65rem 1.1rem; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; font-weight: 600;
 }
+.btn.primary { background: #06b6d4; color: #0b1220; }
+.btn.ghost { background: transparent; color: #e2e8f0; border: 1px solid #334155; }
+
+.grid-3 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 2rem 0; }
+.grid-2 { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 1rem; }
+.card {
+  background: #111827; border: 1px solid #1e293b; border-radius: 12px; padding: 1.25rem;
+}
+.card h2 { margin-top: 0; font-size: 1.1rem; }
+.card p { color: #94a3b8; margin-bottom: 0; }
+.highlight ul { color: #cbd5e1; padding-left: 1.25rem; }
+
+.form label { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; font-size: 0.9rem; }
+.form input, .form textarea {
+  padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #e2e8f0;
+}
+.waitlist label { display: block; margin-bottom: 0.5rem; color: #64748b; font-size: 0.875rem; }
+.row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.row input { flex: 1; min-width: 200px; padding: 0.6rem 0.75rem; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #e2e8f0; }
+
+.dash-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip { padding: 0.35rem 0.75rem; border-radius: 999px; border: 1px solid #334155; background: #0f172a; color: #e2e8f0; cursor: pointer; }
+.chip.active { border-color: #06b6d4; color: #67e8f9; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #1e293b; }
+.scan-result { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+
+.site-nav {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+  padding: 1rem 1.25rem; border-bottom: 1px solid #1e293b; background: #0b1220; position: sticky; top: 0; z-index: 10;
+}
+.site-logo { font-weight: 700; color: #e2e8f0; text-decoration: none; }
+.site-links { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; font-size: 0.9rem; }
+.site-links a { color: #94a3b8; text-decoration: none; }
+.site-links a:hover { color: #67e8f9; }
+.nav-cta { padding: 0.4rem 0.85rem !important; font-size: 0.85rem; }
+
+.api-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+.api-chip {
+  padding: 0.45rem 0.85rem; border-radius: 8px; border: 1px solid #334155; background: #0f172a;
+  color: #cbd5e1; text-decoration: none; font-size: 0.9rem;
+}
+.api-chip:hover { border-color: #06b6d4; color: #67e8f9; }
+
+.calc-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.calc-total { text-align: center; margin-bottom: 1rem; }
+.calc-big { font-size: 2.5rem; font-weight: 700; margin: 0.25rem 0; color: #67e8f9; }
+.calc-line { font-weight: 600; color: #a5f3fc; }
+.key-list { color: #cbd5e1; line-height: 1.8; }
+
+.guide-list { display: grid; gap: 1rem; }
+.guide-card { display: block; text-decoration: none; color: inherit; }
+.guide-card:hover { border-color: #06b6d4; }
+.guide-steps { color: #cbd5e1; line-height: 1.8; padding-left: 1.25rem; }
+.guide-article h2 { margin-top: 1.5rem; }
+
 
 /* —— SecretLayer landing —— */
 

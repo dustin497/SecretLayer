@@ -1,10 +1,14 @@
 #!/usr/bin/env node
+import { resolve } from "node:path";
 import { fetchHeaders, runSafetySuite } from "@secretlayer/safety-engine";
 import { runPromotionGate } from "./gate.js";
 
-const target = process.argv[2] ?? "https://secretlayer.net";
-const version = process.argv[3] ?? "0.2.0";
-const dryRun = !process.argv.includes("--execute");
+const args = process.argv.slice(2);
+const execute = args.includes("--execute");
+const filtered = args.filter((a) => !a.startsWith("--"));
+const target = filtered[0] ?? "https://secretlayer.net";
+const version = filtered[1] ?? "0.3.0";
+const repoRoot = resolve(filtered[2] ?? process.cwd());
 
 async function main() {
   console.log("SecretLayer Promotion Gate\n");
@@ -17,6 +21,7 @@ async function main() {
       jwtSecretSet: Boolean(process.env.JWT_SECRET && process.env.JWT_SECRET !== "change-me-in-production"),
       encryptionEnabled: true,
       rateLimitEnabled: true,
+      auditLogEnabled: Boolean(process.env.ADMIN_API_KEY),
     },
   });
 
@@ -24,15 +29,17 @@ async function main() {
     {
       version,
       highlights: [
-        "Industry-calibrated safety nets before every promotion",
-        "Vault-first projects for the common builder",
-        "Zero-knowledge encrypted sync",
+        "Full vault dashboard with AES-GCM encryption",
+        "Promotion leads with nurture sequences",
+        "Safety scanner + CI integration gate",
       ],
       safetyReport,
     },
     {
-      dryRun,
+      dryRun: !execute,
       webhookUrl: process.env.PROMOTION_WEBHOOK_URL,
+      repoRoot,
+      netlifyHookUrl: process.env.NETLIFY_BUILD_HOOK,
     },
   );
 

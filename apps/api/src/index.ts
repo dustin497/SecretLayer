@@ -3,12 +3,12 @@ import express from "express";
 import rateLimit from "express-rate-limit";
 import { runPromotionGate } from "@secretlayer/promotion";
 import { fetchHeaders, runSafetySuite } from "@secretlayer/safety-engine";
-import {
-  FREE_PLAN_LIMITS,
-  type WaitlistLead,
-  type Wwh2Feedback,
-  type Wwh2Stats,
-} from "@secretlayer/shared";
+import type { PromotionLead, WaitlistLead, Wwh2Feedback, Wwh2Stats } from "@secretlayer/shared";
+import { createBillingRouter, stripeWebhookHandler } from "./billing/router.js";
+import { resolveStripeSecretKey } from "./billing/keys.js";
+import { assertProjectAllowed, assertSecretAllowed } from "./billing/plan.js";
+import { applyReferralOnSignup, generateReferralCode, getReferralStats } from "./referrals.js";
+import { audit, auditLog, getUser, leads, projects, sessions, users, vaultItems } from "./store.js";
 import { createWwh2Store, type Wwh2FeedbackStore } from "./wwh2-store.js";
 import { mountWebApp } from "./static.js";
 
@@ -16,7 +16,8 @@ const app = express();
 const api = express.Router();
 const port = Number(process.env.PORT ?? 8787);
 const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:5173";
-const appVersion = process.env.APP_VERSION ?? "0.2.0";
+const appVersion = process.env.APP_VERSION ?? "0.3.1";
+const adminKey = process.env.ADMIN_API_KEY;
 
 const allowedOrigins = new Set([
   webOrigin,
@@ -34,7 +35,10 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json({ limit: "256kb" }));
+
+app.post("/billing/webhook", express.raw({ type: "application/json" }), stripeWebhookHandler);
+
+app.use(express.json({ limit: "512kb" }));
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -50,9 +54,13 @@ const publicLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-const users = new Map<string, { id: string; email: string; password: string }>();
-const sessions = new Map<string, string>();
-const projects = new Map<string, { id: string; userId: string; name: string }>();
+const leadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 const waitlistLeads = new Map<string, WaitlistLead>();
 let wwh2Store: Wwh2FeedbackStore;
 
@@ -67,13 +75,18 @@ function auth(req: express.Request, res: express.Response, next: express.NextFun
     (req as express.Request & { userId: string }).userId = uid;
     return next();
   }
-
   if (userId) {
     (req as express.Request & { userId: string }).userId = userId;
     return next();
   }
-
   return res.status(401).json({ error: "Authentication required." });
+}
+
+function adminAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!adminKey || req.headers["x-admin-key"] !== adminKey) {
+    return res.status(403).json({ error: "Admin key required." });
+  }
+  next();
 }
 
 async function buildSafetyReport(target = "https://secretlayer.net") {
@@ -85,7 +98,7 @@ async function buildSafetyReport(target = "https://secretlayer.net") {
       jwtSecretSet: Boolean(process.env.JWT_SECRET && process.env.JWT_SECRET !== "change-me-in-production"),
       encryptionEnabled: true,
       rateLimitEnabled: true,
-      auditLogEnabled: waitlistLeads.size > 0,
+      auditLogEnabled: waitlistLeads.size > 0 || auditLog.length > 0,
     },
   });
 }
@@ -111,11 +124,14 @@ const DEFAULT_HIGHLIGHTS = [
   "WWH2 guided help — free for all users",
 ];
 
+api.use("/billing", createBillingRouter(auth, webOrigin));
+
 api.get("/health", async (_req, res) => {
   res.json({
     ok: true,
     service: "secretlayer-backend",
     version: appVersion,
+    stripe: Boolean(resolveStripeSecretKey()),
     waitlistCount: waitlistLeads.size,
     wwh2Sessions: wwh2Store ? await wwh2Store.count() : 0,
     wwh2Store: process.env.DATABASE_URL ? "postgres" : "file",
@@ -224,31 +240,42 @@ api.get("/leads/waitlist/count", publicLimiter, (_req, res) => {
 api.post("/auth/signup", authLimiter, (req, res) => {
   const { email, password } = req.body ?? {};
   if (!email || !password) return res.status(400).json({ error: "Email and password required." });
-
-  const existing = [...users.values()].find((u) => u.email === email);
-  if (existing) return res.status(409).json({ error: "Account already exists." });
-
+  if ([...users.values()].some((u) => u.email === email)) {
+    return res.status(409).json({ error: "Account already exists." });
+  }
   const id = crypto.randomUUID();
-  users.set(id, { id, email, password });
+  const referralCode = generateReferralCode(id);
+  users.set(id, {
+    id,
+    email,
+    password,
+    plan: "free",
+    subscriptionStatus: null,
+    currentPeriodEnd: null,
+    referralCode,
+    referralCount: 0,
+  });
+  applyReferralOnSignup(id, req.body?.referralCode);
   const token = crypto.randomUUID();
   sessions.set(token, id);
-
-  res.json({ user: { id, email }, token });
+  audit("auth.signup", email, id);
+  res.json({ user: { id, email }, token, referralCode });
 });
 
 api.post("/auth/login", authLimiter, (req, res) => {
   const { email, password } = req.body ?? {};
   const user = [...users.values()].find((u) => u.email === email && u.password === password);
   if (!user) return res.status(401).json({ error: "Invalid credentials." });
-
   const token = crypto.randomUUID();
   sessions.set(token, user.id);
+  audit("auth.login", email, user.id);
   res.json({ user: { id: user.id, email: user.email }, token });
 });
 
 api.post("/auth/logout", auth, (req, res) => {
   const token = req.headers.authorization?.slice(7);
   if (token) sessions.delete(token);
+  audit("auth.logout", "session ended", (req as express.Request & { userId: string }).userId);
   res.json({ ok: true });
 });
 
@@ -260,31 +287,121 @@ api.get("/projects", auth, (req, res) => {
 
 api.post("/projects", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
-  const userProjects = [...projects.values()].filter((p) => p.userId === userId);
-  if (userProjects.length >= FREE_PLAN_LIMITS.projects) {
-    return res.status(403).json({ error: "Project limit reached for free plan." });
-  }
+  const user = getUser(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
 
-  const { name } = req.body ?? {};
+  const limitError = assertProjectAllowed(user);
+  if (limitError) return res.status(403).json({ error: limitError });
+
+  const { name, description } = req.body ?? {};
   if (!name) return res.status(400).json({ error: "Project name required." });
-
-  const project = { id: crypto.randomUUID(), userId, name };
+  const project = {
+    id: crypto.randomUUID(),
+    userId,
+    name,
+    description,
+    createdAt: new Date().toISOString(),
+  };
   projects.set(project.id, project);
+  audit("project.create", name, userId);
   res.status(201).json({ project });
 });
 
-api.get("/billing/plan", auth, (req, res) => {
+api.get("/vault-items", auth, (req, res) => {
   const userId = (req as express.Request & { userId: string }).userId;
-  const projectCount = [...projects.values()].filter((p) => p.userId === userId).length;
+  const items = [...vaultItems.values()].filter((v) => v.userId === userId);
+  res.json({ vaultItems: items });
+});
+
+api.put("/vault-items/client/:clientId", auth, (req, res) => {
+  const userId = (req as express.Request & { userId: string }).userId;
+  const user = getUser(userId);
+  if (!user) return res.status(404).json({ error: "User not found." });
+
+  const clientId = String(req.params.clientId);
+  const { label, encryptedBlob, encryptionMeta, updatedAt } = req.body ?? {};
+
+  if (!encryptedBlob || !encryptionMeta?.clientEncrypted) {
+    return res.status(400).json({ error: "Encrypted blob required." });
+  }
+
+  const existing = vaultItems.get(clientId);
+  const limitError = assertSecretAllowed(user, !existing);
+  if (limitError) return res.status(403).json({ error: limitError });
+
+  if (existing && existing.userId !== userId) {
+    return res.status(409).json({ error: "Client ID conflict." });
+  }
+
+  vaultItems.set(clientId, {
+    clientId,
+    userId,
+    label: label ?? "Encrypted vault item",
+    encryptedBlob,
+    encryptionMeta,
+    updatedAt: updatedAt ?? new Date().toISOString(),
+  });
+  audit("vault.sync", `clientId=${clientId}`, userId);
+  res.json({ ok: true, clientId });
+});
+
+api.delete("/vault-items/client/:clientId", auth, (req, res) => {
+  const userId = (req as express.Request & { userId: string }).userId;
+  const clientId = String(req.params.clientId);
+  const item = vaultItems.get(clientId);
+  if (!item || item.userId !== userId) return res.status(404).json({ error: "Not found." });
+  vaultItems.delete(clientId);
+  audit("vault.delete", clientId, userId);
+  res.json({ ok: true });
+});
+
+api.post("/leads", leadLimiter, (req, res) => {
+  const { email, source, intent, message } = req.body ?? {};
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    return res.status(400).json({ error: "Valid email required." });
+  }
+  const lead: PromotionLead = {
+    id: crypto.randomUUID(),
+    email: email.toLowerCase().trim(),
+    source: source ?? "landing",
+    intent: intent ?? "early-access",
+    message,
+    createdAt: new Date().toISOString(),
+  };
+  leads.set(lead.id, lead);
+  audit("lead.capture", `${lead.email} (${lead.source})`);
+  res.status(201).json({ lead: { id: lead.id, email: lead.email } });
+});
+
+api.get("/leads/summary", adminAuth, (_req, res) => {
+  res.json({ leads: [...leads.values()], total: leads.size });
+});
+
+api.post("/analytics/events", publicLimiter, (req, res) => {
+  const { event, properties } = req.body ?? {};
+  if (!event) return res.status(400).json({ error: "Event name required." });
+  audit("analytics", `${event} ${JSON.stringify(properties ?? {})}`);
+  res.json({ ok: true });
+});
+
+api.get("/referrals/me", auth, (req, res) => {
+  const userId = (req as express.Request & { userId: string }).userId;
+  const stats = getReferralStats(userId);
+  if (!stats) return res.status(404).json({ error: "User not found." });
+  res.json(stats);
+});
+
+api.get("/safety/status", publicLimiter, (_req, res) => {
   res.json({
-    plan: "free",
-    limits: FREE_PLAN_LIMITS,
-    usage: { secrets: 0, projects: projectCount },
+    target: "https://secretlayer.net",
+    lastChecked: process.env.SAFETY_LAST_CHECK ?? null,
+    score: process.env.SAFETY_SCORE ? Number(process.env.SAFETY_SCORE) : null,
+    passed: process.env.SAFETY_PASSED === "true",
   });
 });
 
-api.get("/vault-items", auth, (_req, res) => {
-  res.json({ vaultItems: [] });
+api.get("/audit", adminAuth, (_req, res) => {
+  res.json({ entries: auditLog.slice(-100) });
 });
 
 app.use("/api", api);

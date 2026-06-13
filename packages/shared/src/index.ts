@@ -1,3 +1,12 @@
+export { SECRET_PATTERNS, REQUIRED_SECURITY_HEADERS, type SecretPattern } from "./patterns.js";
+export {
+  API_LANDINGS,
+  REFERRAL_GOAL,
+  REFERRAL_REWARD_DAYS,
+  getLandingBySlug,
+  type ApiLanding,
+} from "./growth.js";
+
 export type SafetySeverity = "info" | "warn" | "critical";
 
 export type SafetyCheckId =
@@ -34,7 +43,41 @@ export type PromotionChannel =
   | "marketing-site"
   | "social-announcement"
   | "changelog"
-  | "email-waitlist";
+  | "email-waitlist"
+  | "lead-nurture";
+
+export type LeadSource = "landing" | "waitlist" | "safety-scanner" | "vault-demo" | "changelog";
+export type LeadIntent = "early-access" | "pro-upgrade" | "newsletter" | "builder-tools";
+
+export interface PromotionLead {
+  id: string;
+  email: string;
+  source: LeadSource;
+  intent: LeadIntent;
+  message?: string;
+  createdAt: string;
+  nurturedAt?: string;
+}
+
+export interface NurtureTouchpoint {
+  day: number;
+  subject: string;
+  body: string;
+  cta: string;
+}
+
+export interface VaultItemRecord {
+  clientId: string;
+  userId: string;
+  label: string;
+  encryptedBlob: unknown;
+  encryptionMeta: {
+    clientEncrypted: boolean;
+    algorithm: string;
+    syncedBy: string;
+  };
+  updatedAt: string;
+}
 
 export interface PromotionPlan {
   channels: PromotionChannel[];
@@ -69,12 +112,17 @@ export interface Vault {
   updatedAt: string;
 }
 
-export interface PlanLimits {
-  secrets: number;
-  projects: number;
-}
-
-export const FREE_PLAN_LIMITS: PlanLimits = { secrets: 10, projects: 3 };
+export {
+  PLAN_CATALOG,
+  FREE_PLAN_LIMITS,
+  limitsForPlan,
+  isWithinLimit,
+  normalizePlanId,
+  planToApiLabel,
+  type PlanId,
+  type PlanDefinition,
+  type PlanLimits,
+} from "./plans.js";
 
 export interface WaitlistLead {
   id: string;

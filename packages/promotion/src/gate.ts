@@ -1,9 +1,12 @@
 import type { PromotionResult, SafetyReport } from "@secretlayer/shared";
+import { executePromotionChannels, type ChannelResult } from "./channels.js";
 import { buildPromotionPlan, type PromotionInput } from "./planner.js";
 
 export interface PromotionGateOptions {
   dryRun?: boolean;
   webhookUrl?: string;
+  repoRoot?: string;
+  netlifyHookUrl?: string;
 }
 
 export async function runPromotionGate(
@@ -21,25 +24,29 @@ export async function runPromotionGate(
 
   const plan = buildPromotionPlan(input);
 
-  if (options.dryRun) {
-    return {
-      approved: true,
-      reason: "Dry run — promotion plan generated; no channels executed.",
-      plan,
-    };
-  }
+  const channelResults: ChannelResult[] = await executePromotionChannels(plan, {
+    dryRun: options.dryRun,
+    repoRoot: options.repoRoot,
+    netlifyHookUrl: options.netlifyHookUrl,
+  });
 
-  if (options.webhookUrl) {
+  if (options.webhookUrl && !options.dryRun) {
     await fetch(options.webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event: "secretlayer.promotion.approved", plan, safetyReport }),
+      body: JSON.stringify({ event: "secretlayer.promotion.approved", plan, safetyReport, channelResults }),
     });
   }
 
+  const failed = channelResults.filter((c) => !c.ok);
+  const mode = options.dryRun ? "Dry run — plan generated" : "Promotion executed";
+
   return {
-    approved: true,
-    reason: "Safety nets passed. Promotion plan approved.",
+    approved: failed.length === 0 || options.dryRun === true,
+    reason:
+      failed.length === 0
+        ? `${mode}. Safety nets passed. Channels: ${channelResults.map((c) => c.channel).join(", ")}.`
+        : `${mode} with ${failed.length} channel failure(s): ${failed.map((f) => f.channel).join(", ")}.`,
     plan,
     executedAt: new Date().toISOString(),
   };

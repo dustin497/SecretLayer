@@ -8,6 +8,7 @@ coverage
 .turbo
 *.log
 .DS_Store
+promotion-output/
 data/
 family-testing-services-godaddy-upload.zip
 family-testing-deploy.zip
