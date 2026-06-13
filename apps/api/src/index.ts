@@ -53,7 +53,7 @@ app.get("/health", (_req, res) => {
     ok: true,
     service: "secretlayer-backend",
     version: "0.3.0",
-    stripe: Boolean(process.env.STRIPE_SECRET_KEY),
+    stripe: Boolean(process.env.STRIPE_SECRET_KEY || process.env.BRAND_AGENT_STRIPE_KEY),
   });
 });
 

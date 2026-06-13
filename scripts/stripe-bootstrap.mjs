@@ -10,14 +10,28 @@ import Stripe from "stripe";
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const key = process.env.STRIPE_SECRET_KEY;
+function resolveStripeSecretKey() {
+  return (
+    process.env.STRIPE_SECRET_KEY ||
+    process.env.BRAND_AGENT_STRIPE_KEY ||
+    process.env.BRAND_AGENTS_STRIPE_KEY ||
+    process.env.BRAND_AGENT_STRIPE_SECRET_KEY
+  );
+}
+
+const key = resolveStripeSecretKey();
 const live = process.argv.includes("--live");
 const webOrigin = process.env.WEB_ORIGIN ?? "https://secretlayer.net";
 const apiOrigin = process.env.API_ORIGIN ?? "https://api.secretlayer.net";
 
 if (!key) {
   console.error(`
-SecretLayer Stripe bootstrap — missing STRIPE_SECRET_KEY
+SecretLayer Stripe bootstrap — missing Stripe secret key
+
+Accepted secret names in Cursor (pick ONE):
+  STRIPE_SECRET_KEY
+  BRAND_AGENT_STRIPE_KEY
+  BRAND_AGENTS_STRIPE_KEY
 
 Your Mirror Path AI site uses Payment Link:
   https://buy.stripe.com/bJebJ1dTlfnvdCn4aZbV600

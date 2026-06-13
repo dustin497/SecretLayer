@@ -2,11 +2,12 @@ import Stripe from "stripe";
 import { normalizePlanId, type PlanId } from "@secretlayer/shared";
 import type { User } from "../store.js";
 import { buildPaymentLinkUrl, hasPaymentLinks } from "./paymentLinks.js";
+import { resolveStripeSecretKey } from "./keys.js";
 
 let stripeClient: Stripe | null = null;
 
 export function getStripe(): Stripe | null {
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = resolveStripeSecretKey();
   if (!key) return null;
   if (!stripeClient) {
     stripeClient = new Stripe(key);
@@ -15,7 +16,7 @@ export function getStripe(): Stripe | null {
 }
 
 export function stripeConfigured(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY);
+  return Boolean(resolveStripeSecretKey());
 }
 
 export function billingCheckoutAvailable(): boolean {
