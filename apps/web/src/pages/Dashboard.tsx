@@ -123,6 +123,7 @@ export function Dashboard() {
           <p className="muted">{email}</p>
         </div>
         <div className="actions">
+          <Link to="/referral" className="btn ghost">Referrals</Link>
           <Link to="/safety" className="btn ghost">Safety scanner</Link>
           <button type="button" className="btn ghost" onClick={logout}>Sign out</button>
         </div>

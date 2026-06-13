@@ -22,11 +22,19 @@ export function usageForUser(userId: string) {
   };
 }
 
+export function effectivePlan(user: User): PlanId {
+  if (user.referralRewardUntil && new Date(user.referralRewardUntil) > new Date()) {
+    return "personal";
+  }
+  return user.plan;
+}
+
 export function buildBillingPlanResponse(user: User): BillingPlanResponse {
   const usage = usageForUser(user.id);
-  const limits = limitsForPlan(user.plan);
+  const plan = effectivePlan(user);
+  const limits = limitsForPlan(plan);
   return {
-    plan: planToApiLabel(user.plan),
+    plan: planToApiLabel(plan),
     subscriptionStatus: user.subscriptionStatus ?? null,
     currentPeriodEnd: user.currentPeriodEnd ?? null,
     hasStripeCustomer: Boolean(user.stripeCustomerId),
@@ -37,7 +45,7 @@ export function buildBillingPlanResponse(user: User): BillingPlanResponse {
 
 export function assertProjectAllowed(user: User): string | null {
   const usage = usageForUser(user.id);
-  const limits = limitsForPlan(user.plan);
+  const limits = limitsForPlan(effectivePlan(user));
   if (!isWithinLimit(usage.projects, limits.projects)) {
     return "Project limit reached. Upgrade to Personal or Pro for unlimited projects.";
   }
@@ -47,7 +55,7 @@ export function assertProjectAllowed(user: User): string | null {
 export function assertSecretAllowed(user: User, isNew: boolean): string | null {
   if (!isNew) return null;
   const usage = usageForUser(user.id);
-  const limits = limitsForPlan(user.plan);
+  const limits = limitsForPlan(effectivePlan(user));
   if (!isWithinLimit(usage.secrets, limits.secrets)) {
     return "Secret limit reached. Upgrade to Personal or Pro for unlimited secrets.";
   }

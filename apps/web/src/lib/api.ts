@@ -21,10 +21,10 @@ export function authHeaders(token: string) {
 
 export const api = {
   health: () => request<{ ok: boolean }>("/health"),
-  signup: (email: string, password: string) =>
+  signup: (email: string, password: string, referralCode?: string) =>
     request<{ user: { id: string; email: string }; token: string }>("/auth/signup", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, referralCode }),
     }),
   login: (email: string, password: string) =>
     request<{ user: { id: string; email: string }; token: string }>("/auth/login", {
@@ -70,6 +70,16 @@ export const api = {
       method: "DELETE",
       headers: authHeaders(token),
     }),
+  referralMe: (token: string) =>
+    request<{
+      code: string;
+      count: number;
+      goal: number;
+      remaining: number;
+      rewardActive: boolean;
+      rewardUntil: string | null;
+      shareUrl: string;
+    }>("/referrals/me", { headers: authHeaders(token) }),
   captureLead: (email: string, source: string, intent: string, message?: string) =>
     request<{ lead: { id: string; email: string } }>("/leads", {
       method: "POST",

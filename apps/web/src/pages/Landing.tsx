@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ApiLandingGrid, SiteLayout } from "../components/SiteLayout";
 import { TrustBadge } from "../components/TrustBadge";
 import { api } from "../lib/api";
 
@@ -29,7 +30,8 @@ export function Landing() {
   }
 
   return (
-    <div className="page">
+    <SiteLayout>
+      <div className="page">
       <header className="hero">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
           <p className="eyebrow">secretlayer.net</p>
@@ -41,9 +43,12 @@ export function Landing() {
         </p>
         <div className="actions">
           <Link to="/signup" className="btn primary">Start free vault</Link>
+          <Link to="/calculator" className="btn ghost">API cost calculator</Link>
           <Link to="/safety" className="btn ghost">Run safety scan</Link>
         </div>
       </header>
+
+      <ApiLandingGrid />
 
       <section className="grid-3">
         {features.map((f) => (
@@ -71,6 +76,7 @@ export function Landing() {
         </div>
         {status && <p className="status">{status}</p>}
       </footer>
-    </div>
+      </div>
+    </SiteLayout>
   );
 }

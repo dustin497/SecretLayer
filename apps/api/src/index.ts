@@ -4,6 +4,7 @@ import rateLimit from "express-rate-limit";
 import type { PromotionLead } from "@secretlayer/shared";
 import { createBillingRouter, stripeWebhookHandler } from "./billing/router.js";
 import { assertProjectAllowed, assertSecretAllowed } from "./billing/plan.js";
+import { applyReferralOnSignup, generateReferralCode, getReferralStats } from "./referrals.js";
 import { audit, auditLog, getUser, leads, projects, sessions, users, vaultItems } from "./store.js";
 
 const app = express();
@@ -63,11 +64,22 @@ app.post("/auth/signup", authLimiter, (req, res) => {
     return res.status(409).json({ error: "Account already exists." });
   }
   const id = crypto.randomUUID();
-  users.set(id, { id, email, password, plan: "free", subscriptionStatus: null, currentPeriodEnd: null });
+  const referralCode = generateReferralCode(id);
+  users.set(id, {
+    id,
+    email,
+    password,
+    plan: "free",
+    subscriptionStatus: null,
+    currentPeriodEnd: null,
+    referralCode,
+    referralCount: 0,
+  });
+  applyReferralOnSignup(id, req.body?.referralCode);
   const token = crypto.randomUUID();
   sessions.set(token, id);
   audit("auth.signup", email, id);
-  res.json({ user: { id, email }, token });
+  res.json({ user: { id, email }, token, referralCode });
 });
 
 app.post("/auth/login", authLimiter, (req, res) => {
@@ -190,6 +202,13 @@ app.post("/analytics/events", (req, res) => {
   if (!event) return res.status(400).json({ error: "Event name required." });
   audit("analytics", `${event} ${JSON.stringify(properties ?? {})}`);
   res.json({ ok: true });
+});
+
+app.get("/referrals/me", auth, (req, res) => {
+  const userId = (req as express.Request & { userId: string }).userId;
+  const stats = getReferralStats(userId);
+  if (!stats) return res.status(404).json({ error: "User not found." });
+  res.json(stats);
 });
 
 app.get("/safety/status", (_req, res) => {

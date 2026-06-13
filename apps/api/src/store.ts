@@ -9,6 +9,10 @@ export interface User {
   plan: PlanId;
   subscriptionStatus?: string | null;
   currentPeriodEnd?: string | null;
+  referralCode: string;
+  referredBy?: string;
+  referralCount: number;
+  referralRewardUntil?: string | null;
 }
 
 export interface Project {

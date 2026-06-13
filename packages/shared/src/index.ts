@@ -1,4 +1,11 @@
 export { SECRET_PATTERNS, REQUIRED_SECURITY_HEADERS, type SecretPattern } from "./patterns.js";
+export {
+  API_LANDINGS,
+  REFERRAL_GOAL,
+  REFERRAL_REWARD_DAYS,
+  getLandingBySlug,
+  type ApiLanding,
+} from "./growth.js";
 
 export type SafetySeverity = "info" | "warn" | "critical";
 

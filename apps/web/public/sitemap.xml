@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://secretlayer.net/</loc><priority>1.0</priority></url>
+  <url><loc>https://secretlayer.net/calculator</loc><priority>0.9</priority></url>
+  <url><loc>https://secretlayer.net/guides</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/guides/openai-api-key-vault-week-1</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/referral</loc><priority>0.7</priority></url>
+  <url><loc>https://secretlayer.net/safety</loc><priority>0.7</priority></url>
+  <url><loc>https://secretlayer.net/for/openai</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/supabase</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/stripe</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/github</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/vercel</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/aws</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/anthropic</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/twilio</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/resend</loc><priority>0.8</priority></url>
+  <url><loc>https://secretlayer.net/for/firebase</loc><priority>0.8</priority></url>
+</urlset>

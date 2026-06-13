@@ -8,6 +8,8 @@ const freeUser: User = {
   email: "a@test.com",
   password: "x",
   plan: "free",
+  referralCode: "SL-TEST1234",
+  referralCount: 0,
 };
 
 describe("billing plan", () => {
